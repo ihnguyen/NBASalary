@@ -118,10 +118,7 @@ full_model <- lm(Salary~YrsExperience+Age+G+TS.+DBPM+FG.+eFG.+AST+PF+PTS+weight,
 summary(full_model)
 
 ## Create Reduced Model
-
-
-
-# Omit Variables that are not statistically significant and linearly dependent
+### Omit Variables that are not statistically significant and linearly dependent
 reduced_model <- lm(Salary~Age+G+DBPM+PTS+weight, data=dt)
 summary(reduced_model)
 
