@@ -3,9 +3,10 @@ library(fuzzyjoin)
 library(car)
 
 # Read csv files
-salary_data <- read.csv("C:/Users/ihngu/OneDrive/Documents/NBA_season1718_salary.csv")
-player_data <- read.csv("C:/Users/ihngu/OneDrive/Documents/NBA_player_data.csv")
-stats_data <- read.csv("C:/Users/ihngu/OneDrive/Documents/NBA_stats.csv")
+salary_data <- read.csv("NBA_season1718_salary.csv")
+player_data <- read.csv("NBA_player_data.csv")
+stats_data <- read.csv("NBA_stats.csv")
+player_data2 <- read.csv("Players.csv")
 
 par(mfrow=c(2,3))
 hist(stats_data$PTS,main="Points")
