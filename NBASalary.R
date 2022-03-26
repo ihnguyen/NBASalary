@@ -6,7 +6,7 @@ library(car)
 salary_data <- read.csv("NBA_season1718_salary.csv")
 player_data <- read.csv("NBA_player_data.csv")
 stats_data <- read.csv("NBA_stats.csv")
-player_data2 <- read.csv("Players.csv")
+player_data2 <- read.csv("Players.csv") 
 
 par(mfrow=c(2,3))
 hist(stats_data$PTS,main="Points")
