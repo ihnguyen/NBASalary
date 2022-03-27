@@ -1,16 +1,16 @@
 library(tidyverse)
 library(fuzzyjoin)
 library(car)
+library(emmeans)
 
 # Read csv files
-
-
 
 
 salary_data <- read.csv("NBA_season1718_salary.csv")
 player_data <- read.csv("player_data.csv")
 stats_data <- read.csv("Seasons_Stats.csv")
-player_data2 <- read.csv("Player.csv") 
+player_data <- read.csv("Player.csv") 
+
 
 par(mfrow=c(2,3))
 hist(stats_data$PTS,main="Points")
