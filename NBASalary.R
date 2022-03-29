@@ -61,30 +61,18 @@ play_data <- player_data %>%
 st_data <- stats_data %>% 
   select(-c(X)) %>% 
   subset(Year == 2017)
+
+play_data2 <-player_data2 %>% 
+  select(-c(X)) %>% 
+  na.omit()
 ######################## PROBLEM: multiple observations for players in different teams
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Summaries
-summary(sal_data)
-summary(play_data)
-summary(st_data)
 
 # Store data sets as data frames
 st_fdata <- data.frame(st_data)
 sal_fdata <- data.frame(sal_data)
 play_fdata <- data.frame(play_data)
+play_fdata2 <- data.frame(play_data2)
+
 play_fdata <- play_fdata %>%
   rename(Player = name)
 
@@ -94,27 +82,34 @@ data0 <- data0 %>%
   select(-c(Player.y)) %>%
   rename(Player = Player.x)
 
-summary(data0)
-
 # Inner Joined new data set with Player data set
-data <- stringdist_inner_join(play_fdata,data0, by="Player")
-data <- data %>%
+data1 <- stringdist_inner_join(play_fdata,data0, by="Player")
+data1 <- data1 %>%
   select(-c(Player.y,Tm.y)) %>%
   rename(Player = Player.x) %>%
   rename(Tm = Tm.x) %>%
   rename(Salary = season17_18)
 
-# Summarize the combined overall data
-summary(data)
+# Inner Joined new data set with Player data set 2
+data <- stringdist_inner_join(play_fdata2,data1, by="Player")
+data <- data %>%
+  select(-c(Player.y, height.y, weight.y)) %>%
+  rename(Player = Player.x) %>%
+  rename(Height = height.x) %>%
+  rename(Weight = weight.x)
+  
+data <- data %>% 
+  select(-c(collage, blanl, blank2))
+
 
 # Subset data set to include only data from 2017-2018 Data
-dt <- subset(data, Year == 2017) %>%
-  distinct(Player,birth_date, .keep_all = TRUE)
-head(dt)
+#dt <- subset(data, Year == 2017) %>%
+#  distinct(Player,birth_date, .keep_all = TRUE)
+#head(dt)
 
 # 535 salaries available to 462 salaries in new data set
-nrow(dt)
-462/535
+#nrow(dt)
+#462/535
 
 par(mfrow=c(2,3))
 hist(dt$PTS, main="Points")
