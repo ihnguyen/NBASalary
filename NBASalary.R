@@ -4,14 +4,12 @@ library(car)
 library(emmeans)
 
 # Read csv files
-
-
 salary_data <- read.csv("NBA_season1718_salary.csv")
 player_data <- read.csv("player_data.csv")
 stats_data <- read.csv("Seasons_Stats.csv")
-player_data <- read.csv("Player.csv") 
+player_data2 <- read.csv("Player.csv") # has height and weight variables we want
 
-
+# Histograms
 par(mfrow=c(2,3))
 hist(stats_data$PTS,main="Points")
 hist(player_data$weight, main="Weight")
@@ -20,49 +18,67 @@ hist(stats_data$Age, main="Age")
 hist(stats_data$G, main="Games")
 hist(stats_data$DBPM, main="Defensive Blocks +/-")
 
+# Count observations in each data set
 salary_count <- salary_data %>%
   distinct(Player)
 nrow(salary_count)
+
 stats_count <- stats_data %>%
   distinct(Player)
 nrow(stats_count)
+
 player_count <- player_data %>%
   distinct(name)
 nrow(player_count)
 
+player_count2 <- player_data2 %>%
+  distinct(Player)
+nrow(player_count2)
+
+# Dimensions of each data set
 dim(salary_data)
 dim(player_data)
 dim(stats_data)
+dim(player_data2)
 
 # Identify variable names
 names(salary_data)
 names(player_data)
 names(stats_data)
+names(player_data2)
 
-# Omit Variables from data sets
-st_data <- stats_data %>% 
-  select(-c(X,Pos,GS,MP,PER,X3PAr,FTr,ORB.,DRB.,TRB.,
-            AST.,STL.,BLK.,TOV.,USG.,blanl,OWS,DWS,
-            WS,WS.48,blank2,OBPM,BPM,VORP,X3P,X3PA,
-            X3P.,X2P,X2PA,X2P.,FT, FTA,FT.,ORB,DRB,
-            TRB,STL,BLK,TOV)) %>%
-  na.omit()
+# Omit N/A's
 sal_data <- salary_data %>% 
   select(-c(X)) %>%
   na.omit()
 
-# Calculate Years of Experience from Player data set
+# Omit N/A's and Calculate Years of Experience from Player data set
 play_data <- player_data %>% 
-  select(c(name,year_start,year_end,position,height,weight,birth_date,college)) %>%
-  mutate(YrsExperience = (year_end - year_start))
+  mutate(YrsExperience = (year_end - year_start)) %>% 
+  na.omit()
 
-# Summary of Salary data set
+# Omit N/A's and Only include statistics data from 2017
+st_data <- stats_data %>% 
+  select(-c(X)) %>% 
+  subset(Year == 2017)
+######################## PROBLEM: multiple observations for players in different teams
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Summaries
 summary(sal_data)
-
-# Summary of Player data set
 summary(play_data)
-
-# Summary of Statistics data set
 summary(st_data)
 
 # Store data sets as data frames
