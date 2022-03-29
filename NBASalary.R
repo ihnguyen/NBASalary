@@ -101,6 +101,17 @@ data <- data %>%
 data <- data %>% 
   select(-c(collage, blanl, blank2))
 
+#Making a dataframe with only numerical variables
+data_num <- subset(data, select = c(Height ,Weight ,born ,YrsExperience ,Age ,G, GS ,MP ,PER ,TS. ,X3PAr ,FTr ,ORB. ,DRB. ,TRB. ,AST. ,STL. ,BLK. ,TOV. ,USG. ,OWS ,DWS ,WS ,WS.48 ,OBPM ,DBPM ,BPM ,VORP ,FG ,FGA ,FG. ,X3P ,X3PA ,X2P ,X2PA ,X2P. ,eFG. ,FT ,FTA ,FT. ,ORB ,DRB ,TRB ,AST ,STL ,BLK ,TOV ,PF ,PTS, Salary))
+
+#Correlation matrix as a dataframe
+corr_df <- data.frame(round(cor(data_num[,-51]),2)) #Not including response variable, Salary, which is 50th column
+
+
+#Linear model with all numberical variables
+Salarylm <- lm(Salary ~ ., data = data_num)
+
+
 
 # Subset data set to include only data from 2017-2018 Data
 #dt <- subset(data, Year == 2017) %>%
