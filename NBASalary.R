@@ -102,10 +102,17 @@ data <- data %>%
   select(-c(collage, blanl, blank2))
 
 #Making a dataframe with only numerical variables
-data_num <- subset(data, select = c(Height ,Weight ,born ,YrsExperience ,Age ,G, GS ,MP ,PER ,TS. ,X3PAr ,FTr ,ORB. ,DRB. ,TRB. ,AST. ,STL. ,BLK. ,TOV. ,USG. ,OWS ,DWS ,WS ,WS.48 ,OBPM ,DBPM ,BPM ,VORP ,FG ,FGA ,FG. ,X3P ,X3PA ,X2P ,X2PA ,X2P. ,eFG. ,FT ,FTA ,FT. ,ORB ,DRB ,TRB ,AST ,STL ,BLK ,TOV ,PF ,PTS, Salary))
+data_num <- subset(data, select = c(Height ,Weight ,born ,YrsExperience ,Age ,G,
+                                    GS ,MP ,PER ,TS. ,X3PAr ,FTr ,ORB. ,DRB. ,TRB.
+                                    ,AST. ,STL. ,BLK. ,TOV. ,USG. ,OWS ,DWS ,WS
+                                    ,WS.48 ,OBPM ,DBPM ,BPM ,VORP ,FG ,FGA ,FG.
+                                    ,X3P ,X3PA ,X2P ,X2PA ,X2P. ,eFG. ,FT ,FTA
+                                    ,FT. ,ORB ,DRB ,TRB ,AST ,STL ,BLK ,TOV ,PF
+                                    ,PTS, Salary)) %>%
+  na.omit()
 
 #Correlation matrix as a dataframe
-corr_df <- data.frame(round(cor(data_num[,-51]),2)) #Not including response variable, Salary, which is 50th column
+corr_df <- round(cor(data_num[,1:50]),2) #Not including response variable, Salary, which is 50th column
 
 
 #Linear model with all numberical variables
