@@ -168,12 +168,14 @@ pairs(Salary~Age+G+DBPM+PTS+weight, data=dt)
 ## Compare Full and Reduced Models with Partial F-test
 anova(reduced_model,full_model)
 
-corr_vals <- c()
-indexvec <- seq(2,nrow(corr_df))
-for(i in 1: nrow(corr_df)){
-  for(j in indexvec){
-    if(corr_df[i,j] > .88 == TRUE){
-      corr_vals <- append(corr_vals, c(i,j))
-    }
-  }indexvec <- indexvec[2:length(indexvec)]
-}
+#Trying to scan the upper right half of the correlation matrix..
+
+#corr_vals <- c()
+#indexvec <- seq(2,nrow(corr_df))
+#for(i in 1: nrow(corr_df)){
+ # for(j in indexvec){
+  #  if(corr_df[i,j] > .88 == TRUE){
+    #  corr_vals <- append(corr_vals, c(i,j))
+ #   }
+ # }indexvec <- indexvec[2:length(indexvec)]
+#}
