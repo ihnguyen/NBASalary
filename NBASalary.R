@@ -57,6 +57,12 @@ play_data <- player_data %>%
   mutate(YrsExperience = (year_end - year_start)) %>% 
   na.omit()
 
+#Taking sums of annual stats to calculate career stats 
+career_st <- stats_data %>% 
+  group_by(Player) %>% 
+  summarise(CareerFT = sum(FT), CareerAST = sum(AST), CareerRB = sum(TRB), CareerBLK = sum(BLK), 
+            CareerSTL = sum(STL), )
+
 # Omit N/A's and Only include statistics data from 2017
 st_data <- stats_data %>% 
   select(-c(X)) %>% 
@@ -161,3 +167,13 @@ pairs(Salary~Age+G+DBPM+PTS+weight, data=dt)
 
 ## Compare Full and Reduced Models with Partial F-test
 anova(reduced_model,full_model)
+
+corr_vals <- c()
+indexvec <- seq(2,nrow(corr_df))
+for(i in 1: nrow(corr_df)){
+  for(j in indexvec){
+    if(corr_df[i,j] > .88 == TRUE){
+      corr_vals <- append(corr_vals, c(i,j))
+    }
+  }indexvec <- indexvec[2:length(indexvec)]
+}
