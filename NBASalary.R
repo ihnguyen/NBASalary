@@ -120,6 +120,17 @@ data_num <- subset(data, select = c(Height ,Weight ,born ,YrsExperience ,Age ,G,
 #Correlation matrix as a dataframe
 corr_df <- round(cor(data_num[,1:50]),2) #Not including response variable, Salary, which is 50th column
 
+#Scan the upper right triangle of the correlation matrix. Print indeces that have correlation values greater than .88
+corr_vals <- c()
+for(i in 1:ncol(corr_df)){
+  for(j in i:ncol(corr_df)){
+    if(corr_df[i,j] > .88 & corr_df[i,j] < 1){
+      corr_vals <- append(corr_vals, c(i,j))
+    }
+  }
+}
+corr_vals
+
 
 #Linear model with all numberical variables
 Salarylm <- lm(Salary ~ ., data = data_num)
@@ -167,15 +178,3 @@ pairs(Salary~Age+G+DBPM+PTS+weight, data=dt)
 
 ## Compare Full and Reduced Models with Partial F-test
 anova(reduced_model,full_model)
-
-#Trying to scan the upper right half of the correlation matrix..
-
-#corr_vals <- c()
-#indexvec <- seq(2,nrow(corr_df))
-#for(i in 1: nrow(corr_df)){
- # for(j in indexvec){
-  #  if(corr_df[i,j] > .88 == TRUE){
-    #  corr_vals <- append(corr_vals, c(i,j))
- #   }
- # }indexvec <- indexvec[2:length(indexvec)]
-#}
