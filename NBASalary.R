@@ -96,7 +96,12 @@ par(mfrow=c(2,2));hist(final_data$STL., main="Steal Percentage");qqPlot(final_da
 # log transformation; either sqrt and log work here
 par(mfrow=c(2,2));hist(final_data$BLK., main="Block Percentage");qqPlot(final_data$BLK.);plot((final_data$BLK.),resid(lm1),data=final_data);plot(log(final_data$BLK.),resid(lm1),data=final_data)
 
-
+# final_data[,1] <- sapply(final_data[,1], as.factor)
+# str(final_data)
+# final_data <- data.frame(final_data)
+# # Model with transformed predictors
+# lm2 <- lm(season17_18~log(YrsExperience)+Age+G+GS+MP+PER+TS.+sqrt(X3PAr)+log(FTr)+log(ORB.)+DRB.+log(TRB.)+log(AST.)+STL.+log(BLK.),
+#           data=final_data)
 
 # Correlation matrix as a data frame
 corr_df <- round(cor(final_data[,1:47]),2) #Not including response variable, Salary, which is 50th column
