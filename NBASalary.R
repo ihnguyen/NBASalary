@@ -49,6 +49,7 @@ summary(lm2)
 
 # Check the assumptions
 performance::check_model(lm1)
+performance::check_model(lm2)
 
 # Identify predictors that need transformation
 # sqrt transformation? doesn't look much different
