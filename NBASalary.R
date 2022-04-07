@@ -57,100 +57,44 @@ performance::check_model(lm1)
 
 # Identify predictors that need transformation
 # log transformation
-par(mfrow=c(2,2))
-hist(log(final_data$YrsExperience),main="Years of Experience")
-qqPlot(final_data$YrsExperience,main="Years of Experience")
-plot(final_data$YrsExperience,resid(lm1),data=final_data)
-plot(log(final_data$YrsExperience),resid(lm1),data=final_data)
+par(mfrow=c(2,2));hist(log(final_data$YrsExperience),main="Years of Experience");qqPlot(final_data$YrsExperience,main="Years of Experience");plot(final_data$YrsExperience,resid(lm1),data=final_data);plot(log(final_data$YrsExperience),resid(lm1),data=final_data)
 
 # sqrt transformation? doesn't look much different
-par(mfrow=c(2,2))
-hist(final_data$Age, main="Age")
-qqPlot(final_data$Age)
-plot(final_data$Age,resid(lm1),data=final_data)
-plot(sqrt(final_data$Age),resid(lm1),data=final_data)
+par(mfrow=c(2,2));hist(final_data$Age, main="Age");qqPlot(final_data$Age);plot(final_data$Age,resid(lm1),data=final_data);plot(sqrt(final_data$Age),resid(lm1),data=final_data)
 
-par(mfrow=c(2,2))
-hist(final_data$G, main="Games")
-qqPlot(final_data$G)
-plot(final_data$G,resid(lm1),data=final_data)
 # unsure which tx to do for Games
+par(mfrow=c(2,2));hist(final_data$G, main="Games");qqPlot(final_data$G);plot(final_data$G,resid(lm1),data=final_data)
 
-# log transformation
-par(mfrow=c(2,2))
-hist(final_data$GS, main="Games Started")
-qqPlot(final_data$GS)
-plot((final_data$GS),resid(lm1),data=final_data)
-plot(log(final_data$GS),resid(lm1),data=final_data)
-# possibly better?
+# log transformation; possibly better?
+par(mfrow=c(2,2));hist(final_data$GS, main="Games Started");qqPlot(final_data$GS);plot((final_data$GS),resid(lm1),data=final_data);plot(log(final_data$GS),resid(lm1),data=final_data)
 
-par(mfrow=c(2,2))
-hist(final_data$MP, main="Minutes Played")
-qqPlot(final_data$MP)
-plot(final_data$MP,resid(lm1),data=final_data)
+par(mfrow=c(2,2));hist(final_data$MP, main="Minutes Played");qqPlot(final_data$MP);plot(final_data$MP,resid(lm1),data=final_data)
 
-par(mfrow=c(2,2))
-hist(final_data$PER, main="Player Efficiency Rating")
-qqPlot(final_data$PER)
-plot(final_data$PER,resid(lm1),data=final_data)
+par(mfrow=c(2,2));hist(final_data$PER, main="Player Efficiency Rating");qqPlot(final_data$PER);plot(final_data$PER,resid(lm1),data=final_data)
 
-par(mfrow=c(2,2))
-hist(final_data$TS., main="True Shooting Percentage")
-qqPlot(final_data$TS.)
-plot(final_data$TS.,resid(lm1),data=final_data)
+par(mfrow=c(2,2));hist(final_data$TS., main="True Shooting Percentage");qqPlot(final_data$TS.);plot(final_data$TS.,resid(lm1),data=final_data)
 
 # sqrt transformation
-par(mfrow=c(2,2))
-hist(final_data$X3PAr, main="3-Point Attempt Rate")
-qqPlot(final_data$X3PAr)
-plot((final_data$X3PAr),resid(lm1),data=final_data)
-plot(sqrt(final_data$X3PAr),resid(lm1),data=final_data)
+par(mfrow=c(2,2));hist(final_data$X3PAr, main="3-Point Attempt Rate");qqPlot(final_data$X3PAr);plot((final_data$X3PAr),resid(lm1),data=final_data);plot(sqrt(final_data$X3PAr),resid(lm1),data=final_data)
 
 # log transformation
-par(mfrow=c(2,2))
-hist(final_data$FTr, main="Free Throw Rate")
-qqPlot(final_data$FTr)
-plot((final_data$FTr),resid(lm1),data=final_data)
-plot(log(final_data$FTr),resid(lm1),data=final_data)
+par(mfrow=c(2,2));hist(final_data$FTr, main="Free Throw Rate");qqPlot(final_data$FTr);plot((final_data$FTr),resid(lm1),data=final_data);plot(log(final_data$FTr),resid(lm1),data=final_data)
 
 # log transformation
-par(mfrow=c(2,2))
-hist(final_data$ORB., main="Offensive Rebound Percentage")
-qqPlot(final_data$ORB.)
-plot((final_data$ORB.),resid(lm1),data=final_data)
-plot(log(final_data$ORB.),resid(lm1),data=final_data)
+par(mfrow=c(2,2));hist(final_data$ORB., main="Offensive Rebound Percentage");qqPlot(final_data$ORB.);plot((final_data$ORB.),resid(lm1),data=final_data);plot(log(final_data$ORB.),resid(lm1),data=final_data)
 
-par(mfrow=c(2,2))
-hist(final_data$DRB., main="Defensive Rebound Percentage")
-qqPlot(final_data$DRB.)
-plot(final_data$DRB.,resid(lm1),data=final_data)
+par(mfrow=c(2,2));hist(final_data$DRB., main="Defensive Rebound Percentage");qqPlot(final_data$DRB.);plot(final_data$DRB.,resid(lm1),data=final_data)
 
 # log transformation
-par(mfrow=c(2,2))
-hist(final_data$TRB., main="Total Rebound Percentage")
-qqPlot(final_data$TRB.)
-plot((final_data$TRB.),resid(lm1),data=final_data)
-plot(log(final_data$TRB.),resid(lm1),data=final_data)
+par(mfrow=c(2,2));hist(final_data$TRB., main="Total Rebound Percentage");qqPlot(final_data$TRB.);plot((final_data$TRB.),resid(lm1),data=final_data);plot(log(final_data$TRB.),resid(lm1),data=final_data)
 
 # log transformation
-par(mfrow=c(2,2))
-hist(final_data$AST., main="Assist Percentage")
-qqPlot(final_data$AST.)
-plot((final_data$AST.),resid(lm1),data=final_data)
-plot(log(final_data$AST.),resid(lm1),data=final_data)
+par(mfrow=c(2,2));hist(final_data$AST., main="Assist Percentage");qqPlot(final_data$AST.);plot((final_data$AST.),resid(lm1),data=final_data);plot(log(final_data$AST.),resid(lm1),data=final_data)
 
-par(mfrow=c(2,2))
-hist(final_data$STL., main="Steal Percentage")
-qqPlot(final_data$STL.)
-plot(final_data$STL.,resid(lm1),data=final_data)
+par(mfrow=c(2,2));hist(final_data$STL., main="Steal Percentage");qqPlot(final_data$STL.);plot(final_data$STL.,resid(lm1),data=final_data)
 
-# log transformation
-par(mfrow=c(2,2))
-hist(final_data$BLK., main="Block Percentage")
-qqPlot(final_data$BLK.)
-plot((final_data$BLK.),resid(lm1),data=final_data)
-plot(log(final_data$BLK.),resid(lm1),data=final_data)
-# either sqrt and log work here
+# log transformation; either sqrt and log work here
+par(mfrow=c(2,2));hist(final_data$BLK., main="Block Percentage");qqPlot(final_data$BLK.);plot((final_data$BLK.),resid(lm1),data=final_data);plot(log(final_data$BLK.),resid(lm1),data=final_data)
 
 
 
