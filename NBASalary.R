@@ -6,32 +6,6 @@ library(emmeans)
 salary_data <- read.csv("NBA_season1718_salary.csv")
 player_data <- read.csv("player_data.csv")
 stats_data <- read.csv("Seasons_Stats.csv")
-player_data2 <- read.csv("Player.csv") # has height and weight variables we want
-
-# Histograms
-par(mfrow=c(2,3))
-hist(stats_data$PTS,main="Points")
-hist(player_data$weight, main="Weight")
-hist(salary_data$season17_18, main="Salary")
-hist(stats_data$Age, main="Age")
-hist(stats_data$G, main="Games")
-hist(stats_data$DBPM, main="Defensive Blocks +/-")
-
-# Count observations in each data set
-salary_count <- salary_data %>%
-  distinct(Player); nrow(salary_count)
-stats_count <- stats_data %>%
-  distinct(Player); nrow(stats_count)
-player_count <- player_data %>%
-  distinct(name); nrow(player_count)
-player_count2 <- player_data2 %>%
-  distinct(Player); nrow(player_count2)
-
-# Dimensions of each data set
-dim(salary_data)
-dim(player_data)
-dim(stats_data)
-dim(player_data2)
 
 # Omit X column from all datasets
 sal_data <- salary_data %>% 
@@ -39,37 +13,31 @@ sal_data <- salary_data %>%
 st_data <- stats_data %>% 
   select(-c(X)) %>% 
   subset(Year == 2017)
-play_data2 <-player_data2 %>% 
-  select(-c(X))
-
 # Calculate Years of Experience from Player data set
 play_data <- player_data %>% 
   mutate(YrsExperience = (year_end - year_start))
 
-#Taking sums of annual stats to calculate career stats 
-career_st <- stats_data %>% 
-  group_by(Player) %>% 
-  summarise(CareerFT = sum(FT), CareerAST = sum(AST), CareerRB = sum(TRB), CareerBLK = sum(BLK), 
-            CareerSTL = sum(STL), )
+# #Taking sums of annual stats to calculate career stats 
+# career_st <- stats_data %>% 
+#   group_by(Player) %>% 
+#   summarise(CareerFT = sum(FT), CareerAST = sum(AST), CareerRB = sum(TRB), CareerBLK = sum(BLK), 
+#             CareerSTL = sum(STL), )
 
-# Store data sets as data frames
+# Store data sets as data frames and omit irrelevant columns
 st_fdata <- data.frame(st_data) %>% 
-  select(-c(blanl,blank2))
-sal_fdata <- data.frame(sal_data)
+  select(-c(blanl,blank2)); dim(st_fdata)
+sal_fdata <- data.frame(sal_data); dim(sal_fdata)
 play_fdata <- data.frame(play_data) %>% 
   select(-c(position,year_start,year_end,height,weight)) %>% 
-  rename(Player = name)
-play_fdata2 <- data.frame(play_data2) %>% 
-  select(-c(birth_city,birth_state)) %>% 
-  rename(college = collage)
+  rename(Player = name); dim(play_fdata)
 
 # Full Join all datasets
-data0 <- play_fdata %>% 
+final_data <- play_fdata %>% 
 #  full_join(play_fdata2, by=c("Player","college")) %>% 
   full_join(.,sal_fdata, by="Player") %>% 
   full_join(.,st_fdata, by=unique("Player")) %>% 
   group_by(Player) %>% 
-  summarise(season17_18 = sum(season17_18), Pos, YrsExperience = sum(YrsExperience), Age = mean(Age),
+  summarise(season17_18 = sum(season17_18), YrsExperience = sum(YrsExperience), Age = mean(Age),
             G = mean(G),GS = mean(GS),MP = mean(MP),PER = mean(PER),TS. = mean(TS.),
             X3PAr =mean(X3PAr),FTr = mean(FTr),ORB. = mean(ORB.),DRB. = mean(DRB.),
             TRB. = mean(TRB.),AST. = mean(AST.),STL. = mean(STL.),BLK. = mean(BLK.),
@@ -79,11 +47,9 @@ data0 <- play_fdata %>%
             X2P = mean(X2P) ,X2PA = mean(X2PA) ,X2P. = mean(X2P.) ,eFG. = mean(eFG.),FT = mean(FT),
             FTA = mean(FTA),FT. = mean(FT.),ORB = mean(ORB),DRB = mean(DRB),TRB = mean(TRB),
             AST = mean(AST),STL = mean(STL),BLK = mean(BLK),TOV = mean(TOV),PF = mean(PF),PTS = mean(PTS)) %>% 
-  na.omit(season17_18)
-
-final_data <- distinct(data0) # omitted height & weight since it shortened final data set from 70% to 60%
-dim(final_data)
-405/535
+  na.omit(season17_18); dim(final_data)
+# omitted height & weight since it shortened final data set from 70% to 60%
+403/486
 
 
 # play_fdata <- play_fdata %>%
