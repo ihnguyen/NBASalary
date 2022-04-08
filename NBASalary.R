@@ -32,7 +32,7 @@ data0 <- salary_data %>%
 
 # Omit Player column
 fdata <- data0 %>% 
-  select(-Player) %>% 
+  dplyr::select(-Player) %>% 
   na.omit(); dim(fdata)
 403/486
 
@@ -44,6 +44,13 @@ d <- melt(final_data, id="season17_18") #"Age" ,"G","GS" ,"MP" ,"PER" ,"TS." ,"X
 #"STL." ,"BLK." ,"TOV."))  ,USG. ,OWS ,DWS ,WS,WS.48 ,OBPM ,DBPM ,BPM ,VORP ,FG ,FGA ,FG.,X3P ,X3PA ,X2P ,X2PA ,X2P. ,eFG. ,FT ,FTA,FT. ,ORB ,DRB ,TRB ,AST ,STL ,BLK ,TOV ,PF,PTS")
   
 ggplot(d,aes(x=variable,y=value,color=variable)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(size=10, angle=45))
+
+dt <- final_data[,c(1,2,3,5,6,10)]
+e <- melt(dt,id="season17_18")
+
+ggplot(e,aes(x=variable,y=value,color=variable)) +
   geom_boxplot()
 
 
