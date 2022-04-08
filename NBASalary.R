@@ -1,6 +1,9 @@
 library(tidyverse)
 library(car)
 library(emmeans)
+library(MASS)
+library(reshape)
+library(reshape2)
 
 # Read csv files
 salary_data <- read.csv("NBA_season1718_salary.csv")
@@ -35,6 +38,13 @@ fdata <- data0 %>%
 
 # IF PREDICTOR HAS A ZERO VALUE, WE CAN'T DO LOG TRANSFORMATION
 final_data <- data.frame(fdata)
+
+# Observe data using Scatter Plot
+d <- melt(final_data, id="season17_18") #"Age" ,"G","GS" ,"MP" ,"PER" ,"TS." ,"X3PAr" ,"FTr" ,"ORB." ,"DRB." ,"TRB.","AST.",
+#"STL." ,"BLK." ,"TOV."))  ,USG. ,OWS ,DWS ,WS,WS.48 ,OBPM ,DBPM ,BPM ,VORP ,FG ,FGA ,FG.,X3P ,X3PA ,X2P ,X2PA ,X2P. ,eFG. ,FT ,FTA,FT. ,ORB ,DRB ,TRB ,AST ,STL ,BLK ,TOV ,PF,PTS")
+  
+ggplot(d,aes(x=variable,y=value,color=variable)) +
+  geom_boxplot()
 
 
 # Fit the regression
@@ -173,7 +183,7 @@ corr_vals
 #   summarise(CareerFT = sum(FT), CareerAST = sum(AST), CareerRB = sum(TRB), CareerBLK = sum(BLK), 
 #             CareerSTL = sum(STL), )
 # #Making a dataframe with only numerical variables
-# data_num <- subset(data, select = c(Height ,Weight ,born ,YrsExperience ,Age ,G,
+# data_num <- subset(data, select = c(Age ,G,
 #                                     GS ,MP ,PER ,TS. ,X3PAr ,FTr ,ORB. ,DRB. ,TRB.
 #                                     ,AST. ,STL. ,BLK. ,TOV. ,USG. ,OWS ,DWS ,WS
 #                                     ,WS.48 ,OBPM ,DBPM ,BPM ,VORP ,FG ,FGA ,FG.
