@@ -1,3 +1,7 @@
+
+
+https://www.kaggle.com/code/koki25ando/nba-salary-prediction-using-multiple-regression/data
+
 # [Predicting NBA Salary based on 2017-2018 Salary Data Using Multiple Linear Regression](https://docs.google.com/document/d/1Rwb_BOdaVGwd19w2bWoTJaOnrQaeUJaYNPnnIg2ihjk/edit)
 ### By Thuy-Nhi Nguyen, Miguel (Angel) Moreno, Thi Tran
 
