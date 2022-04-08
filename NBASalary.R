@@ -127,46 +127,73 @@ par(mfrow=c(2,2)); ggplot(final_data, aes(X2PA)) + geom_histogram()
 par(mfrow=c(2,2)); hist(sqrt(final_data$X2PA)); qqPlot(sqrt(final_data$X2PA)); 
 
 #Normal-Looking
-ggplot(final_data, aes(X2P.)) + geom_histogram()
+ggplot(final_data, aes(sqrt(X2P.))) + geom_histogram()
+qqPlot((sqrt(final_data$X2P.)))
 
 #Normal-Looking
 ggplot(final_data, aes(eFG.)) + geom_histogram()
+qqPlot(final_data$eFG.)
 
 #Right Skew
 ggplot(final_data, aes(FT)) + geom_histogram()
+par(mfrow=c(2,1));qqPlot(sqrt(final_data$FT)); qqPlot(log(final_data$FT));
 
 #Right Skew
 ggplot(final_data, aes(FTA)) + geom_histogram()
+# I think log() is better here?
+qqPlot(log(final_data$FTA)); qqPlot(sqrt(final_data$FTA))
 
 #Left Skew
 ggplot(final_data, aes(FT.)) + geom_histogram()
+#Log and sqrt don't seem to change it much.
+qqPlot(final_data$FT.); qqPlot(sqrt(final_data$FT.)); qqPlot(log(final_data$FT. + 20))
 
 #Right Skew
 ggplot(final_data, aes(ORB)) + geom_histogram()
+#Both help, but not sure which is better.
+par(mfrow=c(2,2)); qqPlot(final_data$ORB); qqPlot(sqrt(final_data$ORB)); qqPlot(log(final_data$ORB + 1)); hist(sqrt(final_data$ORB))
 
 #Right Skew
 ggplot(final_data, aes(DRB)) + geom_histogram()
+#sqrt really helped here!
+par(mfrow=c(2,2)); qqPlot(final_data$DRB); qqPlot(sqrt(final_data$DRB)); qqPlot(log(final_data$DRB + 1)); hist(sqrt(final_data$DRB))
 
 #Right Skew
 ggplot(final_data, aes(TRB)) + geom_histogram()
+#sqrt normalizes here
+par(mfrow=c(2,2)); qqPlot(final_data$TRB); qqPlot(sqrt(final_data$TRB)); qqPlot(log(final_data$TRB + 1)); hist(sqrt(final_data$TRB))
 
 #Right Skew
 ggplot(final_data, aes(AST)) + geom_histogram()
+#sqrt seems to help more
+par(mfrow=c(2,2)); qqPlot(final_data$AST); qqPlot(sqrt(final_data$AST)); qqPlot(log(final_data$AST + 1)); hist(sqrt(final_data$AST))
+
 
 #Right Skew
 ggplot(final_data, aes(STL)) + geom_histogram()
+#sqrt normalizes
+par(mfrow=c(2,2)); qqPlot(final_data$STL); qqPlot(sqrt(final_data$STL)); qqPlot(log(final_data$STL + 1)); hist(sqrt(final_data$STL))
+
 
 #Right Skew
 ggplot(final_data, aes(BLK)) + geom_histogram()
+#I think log is better here
+par(mfrow=c(2,2)); qqPlot(final_data$BLK); qqPlot(sqrt(final_data$BLK)); qqPlot(log(final_data$BLK + 1)); hist(log(final_data$BLK))
 
 #Right Skew
 ggplot(final_data, aes(TOV)) + geom_histogram()
+#sqrt worked
+par(mfrow=c(2,2)); qqPlot(final_data$TOV); qqPlot(sqrt(final_data$TOV)); qqPlot(log(final_data$TOV + 1)); hist(sqrt(final_data$TOV))
 
 #Sort of Bimodal
 ggplot(final_data, aes(PF)) + geom_histogram()
+#Probably best the way it is with no transformation
+par(mfrow=c(2,2)); qqPlot(final_data$PF); qqPlot(sqrt(final_data$PF)); qqPlot(log(final_data$PF + 1)); hist(sqrt(final_data$PF))
 
 #Right Skew
 ggplot(final_data, aes(PTS)) + geom_histogram()
+#sqrt
+par(mfrow=c(2,2)); qqPlot(final_data$PTS); qqPlot(sqrt(final_data$PTS)); qqPlot(log(final_data$PTS + 1)); hist(sqrt(final_data$PTS))
 
 # Correlation matrix as a data frame
 corr_df <- round(cor(final_data[,1:47]),2) #Not including response variable, Salary, which is 50th column
