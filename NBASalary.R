@@ -6,9 +6,11 @@ library(emmeans)
 salary_data <- read.csv("NBA_season1718_salary.csv")
 stats_data <- read.csv("Seasons_Stats.csv")
 
+dim(salary_data);dim(stats_data)
+
 # Full Join all data sets
-data0 <- sal_fdata %>% 
-  full_join(.,st_fdata, by=unique("Player")) %>% 
+data0 <- salary_data %>% 
+  full_join(.,stats_data, by=unique("Player")) %>% 
   subset(Year == 2017) %>% 
   group_by(Player) %>% 
   summarise(season17_18 = sum(season17_18), Age = mean(Age),
@@ -34,6 +36,7 @@ fdata <- data0 %>%
 # IF PREDICTOR HAS A ZERO VALUE, WE CAN'T DO LOG TRANSFORMATION
 final_data <- data.frame(fdata)
 
+
 # Fit the regression
 lm1 <- lm(season17_18 ~ ., data = final_data)
 summary(lm1)
@@ -50,6 +53,15 @@ summary(lm2)
 # Check the assumptions
 performance::check_model(lm1)
 performance::check_model(lm2)
+
+# Model Comparisons
+# Is there a relationship between the response variable and at least one of the predictors?
+null_model <- lm(season17_18~1,data=final_data)
+anova(null_model,lm2)
+
+# Is there one a specific subset of predictors that can be dropped out?
+#reduced_model <- lm(season17_18~ , data=final_data)
+#anova(reduced_model,lm2)
 
 # Identify predictors that need transformation
 # sqrt transformation? doesn't look much different
