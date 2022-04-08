@@ -102,6 +102,55 @@ par(mfrow=c(2,2));hist(final_data$BLK., main="Block Percentage");qqPlot(final_da
 
 
 
+## Angel's Plots for transformation##
+
+#Right Skew
+par(mfrow=c(2,2)); ggplot(final_data, aes(X2PA)) + geom_histogram()
+#log() made it left skewed.. sqrt() makes data most normal
+par(mfrow=c(2,2)); hist(sqrt(final_data$X2PA)); qqPlot(sqrt(final_data$X2PA)); 
+
+#Normal-Looking
+ggplot(final_data, aes(X2P.)) + geom_histogram()
+
+#Normal-Looking
+ggplot(final_data, aes(eFG.)) + geom_histogram()
+
+#Right Skew
+ggplot(final_data, aes(FT)) + geom_histogram()
+
+#Right Skew
+ggplot(final_data, aes(FTA)) + geom_histogram()
+
+#Left Skew
+ggplot(final_data, aes(FT.)) + geom_histogram()
+
+#Right Skew
+ggplot(final_data, aes(ORB)) + geom_histogram()
+
+#Right Skew
+ggplot(final_data, aes(DRB)) + geom_histogram()
+
+#Right Skew
+ggplot(final_data, aes(TRB)) + geom_histogram()
+
+#Right Skew
+ggplot(final_data, aes(AST)) + geom_histogram()
+
+#Right Skew
+ggplot(final_data, aes(STL)) + geom_histogram()
+
+#Right Skew
+ggplot(final_data, aes(BLK)) + geom_histogram()
+
+#Right Skew
+ggplot(final_data, aes(TOV)) + geom_histogram()
+
+#Sort of Bimodal
+ggplot(final_data, aes(PF)) + geom_histogram()
+
+#Right Skew
+ggplot(final_data, aes(PTS)) + geom_histogram()
+
 # Correlation matrix as a data frame
 corr_df <- round(cor(final_data[,1:47]),2) #Not including response variable, Salary, which is 50th column
 
