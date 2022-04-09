@@ -68,6 +68,11 @@ lm2 <- lm(season17_18~Age+G+GS+MP+PER+TS.+sqrt(X3PAr)+log(FTr+1)+log(ORB.+1)+DRB
           , data=final_data)
 summary(lm2)
 
+# Linear model with our first set of rejects (based on high colinearity & lower correlation with the response variable)
+lm3 <- update(lm2, ~. - log(eFG. + 20) - log(TRB. + 1) - log(OWS + 20) - sqrt(FG + 20) - sqrt(X2P + 20) - sqrt(X2PA + 20) - log(FT + 20) - 
+                sqrt(TRB + 20) - sqrt(X3PA + 20))
+summary(lm3)
+
 # Check the assumptions
 performance::check_model(lm1)
 performance::check_model(lm2)
@@ -198,18 +203,46 @@ ggplot(final_data, aes(PTS)) + geom_histogram()
 par(mfrow=c(2,3)); qqPlot(final_data$PTS); qqPlot(sqrt(final_data$PTS)); qqPlot(log(final_data$PTS + 1)); plot(final_data$PTS, lm1$residuals); plot(log(final_data$PTS), lm1$residuals); plot(sqrt(final_data$PTS), lm1$residuals)
 
 # Correlation matrix as a data frame
-corr_df <- round(cor(final_data[,1:47]),2) #Not including response variable, Salary, which is 50th column
+corr_df <- round(cor(final_data[,1:46]),2) #Not including response variable, Salary, which is 50th column
 
-# Scan the upper right triangle of the correlation matrix. Print indeces that have correlation values greater than .88
+#find indeces with correlation greater than .9 and less than 1
+ind <- which(corr_df >0.9 & corr_df <1)
+ind
+
+corr_df[ind,]
+
+# Scan the upper right triangle of the correlation matrix. Print indeces that have correlation values greater than .9
 corr_vals <- c()
 for(i in 1:ncol(corr_df)){
   for(j in i:ncol(corr_df)){
-    if(corr_df[i,j] > .88 & corr_df[i,j] < 1){
+    if(corr_df[i,j] > .9 & corr_df[i,j] < 1){
       corr_vals <- append(corr_vals, c(i,j))
     }
   }
 }
+length(corr_vals)
 corr_vals
+
+
+# Scan the upper right triangle of the correlation matrix. Print indeces that have correlation values greater than .8 andless than .9
+corr_vals2 <- c()
+for(i in 1:ncol(corr_df)){
+  for(j in i:ncol(corr_df)){
+    if(corr_df[i,j] > .83 & corr_df[i,j] <= .9){
+      corr_vals2 <- append(corr_vals2, c(i,j))
+    }
+  }
+}
+length(corr_vals2)
+corr_vals2
+
+# corr_pairs <- matrix(corr_vals, ncol = 2, byrow = TRUE)
+# corr_pairs
+
+pairs(season17_18 ~ TS. + eFG. + DRB + TRB + OWS + WS + FG + FGA + X2P + X2PA ,data = final_data)
+
+
+
 
 #Thi's transformation:
 
