@@ -62,7 +62,8 @@ summary(lm1)
 # Model with transformed predictors
 lm2 <- lm(season17_18~Age+G+GS+MP+PER+TS.+sqrt(X3PAr)+log(FTr+1)+log(ORB.+1)+DRB.+log(TRB.+1)+log(AST.+1)+STL.+sqrt(BLK.)
             
-          + log(TOV.) + USG. + log(OWS) + sqrt(DWS) + sqrt(WS) + WS.48 + sqrt(OBPM) + sqrt(DBPM) + BPM = log(VORP) + sqrt(FG) + FG. + sqrt(X3PA) + sqrt(X2P)
+          + log(TOV.+ 20) + USG. + log(OWS+ 20) + sqrt(DWS+ 20) + sqrt(WS+ 20) + WS.48 + sqrt(OBPM + 20) + sqrt(DBPM + 20) + BPM + log(VORP+ 20) + sqrt(FG+ 20) + FG. + sqrt(X3PA+ 20) + sqrt(X2P+ 20) + 
+            sqrt(X2PA+ 20) + log(X2P.+ 20) + log(eFG.+ 20) + log(FT+ 20) + log(FTA +6) + FT. + log(ORB+ 20) + sqrt(DRB+ 20) + sqrt(TRB+ 20) + log(AST+ 20) + sqrt(STL+ 20) + log(BLK+ 20) + sqrt(TOV+ 20) + PF + sqrt(PTS+ 20)
           
           , data=final_data)
 summary(lm2)
