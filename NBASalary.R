@@ -73,7 +73,7 @@ corr_pairs <- matrix(corr_vals, ncol = 2, byrow = TRUE); corr_pairs
 
 # Linear model with our first set of rejects (based on high colinearity & lower correlation with the response variable)
 lm3 <- update(lm2, ~. - log(eFG. + 20) - log(TRB. + 1) - log(OWS + 20) - sqrt(FG + 20) - sqrt(X2P + 20) - sqrt(X2PA + 20) - log(FT + 20) - 
-                sqrt(TRB + 20) - sqrt(X3PA + 20) - sqrt(FGA)); summary(lm3)
+                sqrt(TRB + 20) - sqrt(X3PA + 20) - sqrt(FGA)); summary(lm3); performance::check_model(lm3)
 
 ############ Next time do lm before lm4 that removes the negative correlations b/w (-1,-.9] ###############
 
@@ -93,7 +93,10 @@ corr_pairs2
 #Linear model with our second set of rejects (based on high colinearity & lower correlation with the response variable)
 lm4 <- update(lm3, ~. - G - MP - WS.48 - log(ORB. + 1) - sqrt(TRB + 20) - log(ORB + 20) - log(VORP + 20) - log(FTA + 6) - 
                 sqrt(OBPM + 20) - log(FT + 20) - sqrt(TOV + 20) - log(X2P. + 20) - FG. - sqrt(X2P + 20) - sqrt(X2PA + 20) -
-                log(AST + 20)); summary(lm4)
+                log(AST + 20)); summary(lm4); performance::check_model(lm4)
+
+plot((final_data$season17_18)^0.25, resid(lm4), data=final_data)
+round(vif(lm4),2)
 
 
 
