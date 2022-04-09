@@ -62,8 +62,7 @@ summary(lm1)
 # Model with transformed predictors
 lm2 <- lm(season17_18~Age+G+GS+MP+PER+TS.+sqrt(X3PAr)+log(FTr+1)+log(ORB.+1)+DRB.+log(TRB.+1)+log(AST.+1)+STL.+sqrt(BLK.)
             
-          +TOV. + USG.+ WS.48 + OBPM + DBPM + BPM + FG. + sqrt(OWS) + sqrt(DWS) + sqrt(WS) + sqrt(VORP) + sqrt(FG)
-          + sqrt(FGA) + sqrt(X3PA) + sqrt(X2P)
+          + log(TOV.) + USG. + log(OWS) + sqrt(DWS) + sqrt(WS) + WS.48 + sqrt(OBPM) + sqrt(DBPM) + BPM = log(VORP) + sqrt(FG) + FG. + sqrt(X3PA) + sqrt(X2P)
           
           , data=final_data)
 summary(lm2)
@@ -213,73 +212,125 @@ corr_vals
 
 #Thi's transformation:
 
-#Normal: 
+#RIGHT SKEWED: 
 ggplot(final_data, aes(TOV.)) + geom_histogram()
+par(mfrow=c(2,3));hist(final_data$TOV., main="Games");qqPlot(final_data$TOV);plot(final_data$TOV,resid(lm1),data=final_data)
+qqPlot(log(final_data$TOV. + 1))
 
+#Use log
+plot(log(final_data$TOV.),resid(lm1),data=final_data)
 
-#Normal
+#LIGHT RIGHT SKEWED : No transfromation needed
 ggplot(final_data, aes(USG.)) + geom_histogram()
 
+par(mfrow=c(2,3));hist(final_data$USG., main="Games");qqPlot(final_data$USG.);plot(final_data$USG.,resid(lm1),data=final_data)
+qqPlot(log(final_data$USG. + 1))
 
-#right skewed
+#right skewed: Use log
 ggplot(final_data, aes(OWS)) + geom_histogram()
 ##Normalized:
-par(mfrow=c(2,1));qqPlot(sqrt(final_data$OWS)); 
-  
-  
-#right skewed
+
+par(mfrow=c(2,3));hist(final_data$OWS, main="Games");qqPlot(final_data$OWS);plot(final_data$OWS,resid(lm1),data=final_data) 
+qqPlot(sqrt(final_data$OWS)); qqPlot(log(final_data$OWS + 1))
+plot(log(final_data$OWS),resid(lm1),data=final_data)
+
+#right skewed : sqrt
 ggplot(final_data, aes(DWS)) + geom_histogram()
 ##Normalized:
-par(mfrow=c(2,1));qqPlot(sqrt(final_data$DWS)); 
-  
-#right skewed
-ggplot(final_data, aes(WS)) + geom_histogram()
-##normalized:
-par(mfrow=c(2,1));qqPlot(sqrt(final_data$WS)); 
 
-#normal
-ggplot(final_data, aes(WS.48)) + geom_histogram()
+par(mfrow=c(2,3));hist(final_data$DWS, main="Games");qqPlot(final_data$DWS);plot(final_data$DWS,resid(lm1),data=final_data)
 
-#normal
+plot(sqrt(final_data$DWS),resid(lm1),data=final_data)
+
+#right skewed : use sqrt
+
+
+
+par(mfrow=c(2,3));hist(final_data$WS, main="Games");qqPlot(final_data$WS);plot(final_data$WS,resid(lm1),data=final_data)
+
+plot(sqrt(final_data$WS),resid(lm1),data=final_data)
+
+#normal : no
+
+par(mfrow=c(2,3));hist(final_data$WS.48, main="Win shares per 48 min");qqPlot(final_data$WS.48);plot(final_data$WS.48,resid(lm1),data=final_data)
+
+plot(log(final_data$WS.48),resid(lm1),data=final_data)
+plot(sqrt(final_data$WS.48),resid(lm1),data=final_data)
+
+
+#normal : use sqrt
 ggplot(final_data, aes(OBPM)) + geom_histogram()
+par(mfrow=c(2,3));hist(final_data$OBPM, main="OBPM");qqPlot(final_data$OBPM);plot(final_data$OBPM,resid(lm1),data=final_data)
 
-#normal
+
+plot(sqrt(final_data$OBPM),resid(lm1),data=final_data)
+#normal : use sqrt
 ggplot(final_data, aes(DBPM)) + geom_histogram()
+par(mfrow=c(2,3));hist(final_data$DMPM, main="DBPM");qqPlot(final_data$DBPM);plot(final_data$DBPM,resid(lm1),data=final_data)
 
-#normal
+
+
+plot(sqrt(final_data$DBPM),resid(lm1),data=final_data)
+
+
+#normal : NTN : outliers
 ggplot(final_data, aes(BPM)) + geom_histogram()
+par(mfrow=c(2,2));hist(final_data$BPM, main="BPM");qqPlot(final_data$BPM);plot(final_data$BPM,resid(lm1),data=final_data)
 
 
-#right skewed
+
+#right skewed : use log
 ggplot(final_data, aes(VORP)) + geom_histogram()
 ##normalized:
-par(mfrow=c(2,1));qqPlot(sqrt(final_data$VORP)); 
+
+par(mfrow=c(2,3));hist(final_data$VORP, main="VORP");qqPlot(final_data$VORP);plot(final_data$VORP,resid(lm1),data=final_data)
+plot(log(final_data$VORP),resid(lm1),data=final_data)
 
 
-# chucky right skewed?
+# chucky right skewed?  USE sqrt
 ggplot(final_data, aes(FG)) + geom_histogram()
 ##Normalized:
-par(mfrow=c(2,1));qqPlot(sqrt(final_data$FG)); qqPlot(log(final_data$FG));
+
+par(mfrow=c(2,3));hist(final_data$FG, main="FG");qqPlot(final_data$FG);plot(final_data$FG,resid(lm1),data=final_data)
 
 
-# right skewed but weird right
-ggplot(final_data, aes(FGA)) + geom_histogram()
-par(mfrow=c(2,1));qqPlot(sqrt(final_data$FGA)); qqPlot(log(final_data$FGA));
+plot(sqrt(final_data$FG),resid(lm1),data=final_data)
+
+# right skewed but weird right : USE sqrt
 
 
-#normal
-ggplot(final_data, aes(FG.)) + geom_histogram()
+par(mfrow=c(2,3));hist(final_data$FGA, main="FG");qqPlot(final_data$FGA);plot(final_data$FGA,resid(lm1),data=final_data)
+
+
+plot(sqrt(final_data$FGA),resid(lm1),data=final_data)
+
+
+#normal : NTN
+
+par(mfrow=c(2,3));hist(final_data$FG., main="FG.");qqPlot(final_data$FG.);plot(final_data$FG.,resid(lm1),data=final_data)
+
+
+plot(log(final_data$FG.),resid(lm1),data=final_data)
+plot(sqrt(final_data$FG.),resid(lm1),data=final_data)
+
 
 # right skewed
-ggplot(final_data, aes(X3PA)) + geom_histogram()
-##normalized
-par(mfrow=c(2,1));qqPlot(sqrt(final_data$X3PA)); qqPlot(log(final_data$X3PA));
 
 
-#right skewed
+##normalized : USE sqrt
+par(mfrow=c(2,3));qqPlot(sqrt(final_data$X3PA)); qqPlot(log(final_data$X3PA));
+
+plot(sqrt(final_data$X3PA),resid(lm1),data=final_data)
+
+
+
+#right skewed USE qrt
 ggplot(final_data, aes(X2P)) + geom_histogram()
-##normalized :
-par(mfrow=c(2,1));qqPlot(sqrt(final_data$X2P)); 
+
+par(mfrow=c(2,3));hist(final_data$X2P, main="X2P");qqPlot(final_data$X2P);plot(final_data$X2P,resid(lm1),data=final_data)
+
+plot(log(final_data$X2P),resid(lm1),data=final_data)
+plot(sqrt(final_data$X2P),resid(lm1),data=final_data)
 
 
 # #Taking sums of annual stats to calculate career stats 
