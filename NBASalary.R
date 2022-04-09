@@ -98,7 +98,24 @@ lm4 <- update(lm3, ~. - G - MP - WS.48 - log(ORB. + 1) - sqrt(TRB + 20) - log(OR
 plot((final_data$season17_18)^0.25, resid(lm4), data=final_data)
 round(vif(lm4),2)
 
+########### Next we will make a new correlation matrix that only includes the variables in our most recent model
+# lm4
 
+corr_df2 <- data.frame(corr_df)[,c(1,2,4,6,7,8,9,11,13,14,15,16,17,19,20,23,24,37,39,42,43,45,46)]
+view(corr_df2)
+
+
+corr_vals3 <- c()
+for(i in 1:ncol(corr_df2)){
+  for(j in i:ncol(corr_df2)){
+    if(abs(corr_df2[i,j]) >= .7 & abs(corr_df2[i,j]) < 1){
+      corr_vals3 <- append(corr_vals3, c(i,j))
+    }
+  }
+}; length(corr_vals3); corr_vals3
+
+corr_pairs3 <- matrix(corr_vals3, ncol = 2, byrow = TRUE)
+corr_pairs3
 
 #pairs(season17_18 ~ TS. + eFG. + DRB + TRB + OWS + WS + FG + FGA + X2P + X2PA ,data = final_data)
 # vif <- which(vif(corr_df[,-1])>10); vif
