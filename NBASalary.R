@@ -62,7 +62,7 @@ summary(lm1)
 # Model with transformed predictors
 lm2 <- lm(season17_18~Age+G+GS+MP+PER+TS.+sqrt(X3PAr)+log(FTr+1)+log(ORB.+1)+DRB.+log(TRB.+1)+log(AST.+1)+STL.+sqrt(BLK.)
             
-          + log(TOV.+ 20) + USG. + log(OWS+ 20) + sqrt(DWS+ 20) + sqrt(WS+ 20) + WS.48 + sqrt(OBPM + 20) + sqrt(DBPM + 20) + BPM + log(VORP+ 20) + sqrt(FG+ 20) + FG. + sqrt(X3PA+ 20) + sqrt(X2P+ 20) + 
+          + log(TOV.+ 20) + USG. + log(OWS+ 20) + sqrt(DWS+ 20) + sqrt(WS+ 20) + WS.48 + sqrt(OBPM + 20) + sqrt(DBPM + 20) + BPM + log(VORP+ 20) + sqrt(FG+ 20) + FG.+ sqrt(FGA) + sqrt(X3PA+ 20) + sqrt(X2P+ 20) + 
             sqrt(X2PA+ 20) + log(X2P.+ 20) + log(eFG.+ 20) + log(FT+ 20) + log(FTA +6) + FT. + log(ORB+ 20) + sqrt(DRB+ 20) + sqrt(TRB+ 20) + log(AST+ 20) + sqrt(STL+ 20) + log(BLK+ 20) + sqrt(TOV+ 20) + PF + sqrt(PTS+ 20)
           
           , data=final_data)
@@ -70,8 +70,16 @@ summary(lm2)
 
 # Linear model with our first set of rejects (based on high colinearity & lower correlation with the response variable)
 lm3 <- update(lm2, ~. - log(eFG. + 20) - log(TRB. + 1) - log(OWS + 20) - sqrt(FG + 20) - sqrt(X2P + 20) - sqrt(X2PA + 20) - log(FT + 20) - 
-                sqrt(TRB + 20) - sqrt(X3PA + 20))
+                sqrt(TRB + 20) - sqrt(X3PA + 20) - sqrt(FGA))
 summary(lm3)
+
+############ Next time do lm before lm4 that removes the negative correlations b/w (-1,-.9] ###############
+
+#Linear model with our second set of rejects (based on high colinearity & lower correlation with the response variable)
+lm4 <- update(lm3, ~. - G - MP - WS.48 - log(ORB. + 1) - sqrt(TRB + 20) - log(ORB + 20) - log(VORP + 20) - log(FTA + 6) - 
+                sqrt(OBPM + 20) - log(FT + 20) - sqrt(TOV + 20) - log(X2P. + 20) - FG. - sqrt(X2P + 20) - sqrt(X2PA + 20) -
+                log(AST + 20))
+summary(lm4)
 
 # Check the assumptions
 performance::check_model(lm1)
@@ -125,7 +133,7 @@ par(mfrow=c(2,2));hist(final_data$BLK., main="Block Percentage");qqPlot(final_da
 
 
 
-## Angel's Plots for transformation##
+## Angel's Plots for transformation###################################
 
 #Right Skew
 par(mfrow=c(2,2)); ggplot(final_data, aes(X2PA)) + geom_histogram()
@@ -223,8 +231,13 @@ for(i in 1:ncol(corr_df)){
 length(corr_vals)
 corr_vals
 
+#Compare variables with high colinearity with the response variable###
+#Make a matrix to see the index pais with high colinearity
+colnames(corr_df)
+corr_pairs <- matrix(corr_vals, ncol = 2, byrow = TRUE)
 
-# Scan the upper right triangle of the correlation matrix. Print indeces that have correlation values greater than .8 andless than .9
+
+# Scan the upper right triangle of the correlation matrix. Print indeces that have correlation values greater than .83 and less than .9
 corr_vals2 <- c()
 for(i in 1:ncol(corr_df)){
   for(j in i:ncol(corr_df)){
@@ -236,10 +249,17 @@ for(i in 1:ncol(corr_df)){
 length(corr_vals2)
 corr_vals2
 
+corr_pairs2 <- matrix(corr_vals2, ncol = 2, byrow = TRUE)
+corr_pairs2
+
+
+
+
+###Pairs that we commented out 
 # corr_pairs <- matrix(corr_vals, ncol = 2, byrow = TRUE)
 # corr_pairs
 
-pairs(season17_18 ~ TS. + eFG. + DRB + TRB + OWS + WS + FG + FGA + X2P + X2PA ,data = final_data)
+#pairs(season17_18 ~ TS. + eFG. + DRB + TRB + OWS + WS + FG + FGA + X2P + X2PA ,data = final_data)
 
 
 
