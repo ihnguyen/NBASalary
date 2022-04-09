@@ -62,7 +62,8 @@ summary(lm1)
 # Model with transformed predictors
 lm2 <- lm(season17_18~Age+G+GS+MP+PER+TS.+sqrt(X3PAr)+log(FTr+1)+log(ORB.+1)+DRB.+log(TRB.+1)+log(AST.+1)+STL.+sqrt(BLK.)
             
-          
+          +TOV. + USG.+ WS.48 + OBPM + DBPM + BPM + FG. + sqrt(OWS) + sqrt(DWS) + sqrt(WS) + sqrt(VORP) + sqrt(FG)
+          + sqrt(FGA) + sqrt(X3PA) + sqrt(X2P)
           
           , data=final_data)
 summary(lm2)
@@ -209,6 +210,75 @@ for(i in 1:ncol(corr_df)){
 }
 corr_vals
 
+#Thi's transformation:
+
+#Normal: 
+ggplot(final_data, aes(TOV.)) + geom_histogram()
+
+
+#Normal
+ggplot(final_data, aes(USG.)) + geom_histogram()
+
+
+#right skewed
+ggplot(final_data, aes(OWS)) + geom_histogram()
+##Normalized:
+par(mfrow=c(2,1));qqPlot(sqrt(final_data$OWS)); 
+  
+  
+#right skewed
+ggplot(final_data, aes(DWS)) + geom_histogram()
+##Normalized:
+par(mfrow=c(2,1));qqPlot(sqrt(final_data$DWS)); 
+  
+#right skewed
+ggplot(final_data, aes(WS)) + geom_histogram()
+##normalized:
+par(mfrow=c(2,1));qqPlot(sqrt(final_data$WS)); 
+
+#normal
+ggplot(final_data, aes(WS.48)) + geom_histogram()
+
+#normal
+ggplot(final_data, aes(OBPM)) + geom_histogram()
+
+#normal
+ggplot(final_data, aes(DBPM)) + geom_histogram()
+
+#normal
+ggplot(final_data, aes(BPM)) + geom_histogram()
+
+
+#right skewed
+ggplot(final_data, aes(VORP)) + geom_histogram()
+##normalized:
+par(mfrow=c(2,1));qqPlot(sqrt(final_data$VORP)); 
+
+
+# chucky right skewed?
+ggplot(final_data, aes(FG)) + geom_histogram()
+##Normalized:
+par(mfrow=c(2,1));qqPlot(sqrt(final_data$FG)); qqPlot(log(final_data$FG));
+
+
+# right skewed but weird right
+ggplot(final_data, aes(FGA)) + geom_histogram()
+par(mfrow=c(2,1));qqPlot(sqrt(final_data$FGA)); qqPlot(log(final_data$FGA));
+
+
+#normal
+ggplot(final_data, aes(FG.)) + geom_histogram()
+
+# right skewed
+ggplot(final_data, aes(X3PA)) + geom_histogram()
+##normalized
+par(mfrow=c(2,1));qqPlot(sqrt(final_data$X3PA)); qqPlot(log(final_data$X3PA));
+
+
+#right skewed
+ggplot(final_data, aes(X2P)) + geom_histogram()
+##normalized :
+par(mfrow=c(2,1));qqPlot(sqrt(final_data$X2P)); 
 
 
 # #Taking sums of annual stats to calculate career stats 
