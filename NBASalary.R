@@ -117,26 +117,29 @@ for(i in 1:ncol(corr_df2)){
 corr_pairs3 <- matrix(corr_vals3, ncol = 2, byrow = TRUE)
 corr_pairs3
 
-lm5 <- update(lm4, season17_18 ~ . - PER - TS. - sqrt(DRB+20) - sqrt(WS + 20)); summary(lm5)
+lm5 <- update(lm4, ~ . - PER - TS. - sqrt(DRB+20) - sqrt(WS + 20)); summary(lm5)
 
 n = nrow(final_data)
 lm6 <- step(lm5, k = log(n))
 summary(lm6)
 
-performance::check_model(lm6)
 ### Looks good!!! will now do stepwise selection, we will remove variables one-by-one based off of high p-values
 
-lm7 <- update(lm5, season17_18 ~ . - FT.); summary(lm7)
-lm8 <- update(lm7, season17_18 ~ . - sqrt(DBPM + 20)); summary(lm8)
-lm9 <- update(lm8, season17_18 ~ . - STL.); summary(lm9)
-lm10 <- update(lm9, season17_18 ~ . - log(FTr + 1)); summary(lm10)
-lm11 <- update(lm10, season17_18 ~ . - log(BLK + 20)); summary(lm11)
-lm12 <- update(lm11, season17_18 ~ . - sqrt(BLK.)); summary(lm12)
-lm13 <- update(lm12, season17_18 ~ . - sqrt(X3PAr)); summary(lm13)
-lm14 <- update(lm13, season17_18 ~ . - DRB.); summary(lm14)
-lm15 <- update(lm14, season17_18 ~ . - sqrt(STL + 20)); summary(lm15)
-lm16 <- update(lm7, season17_18 ~ . - sqrt(DBPM + 20)); summary(lm8)
+lm7 <- update(lm5,  ~ . - FT.); summary(lm7)
+lm8 <- update(lm7,  ~ . - sqrt(DBPM + 20)); summary(lm8)
+lm9 <- update(lm8,  ~ . - STL.); summary(lm9)
+lm10 <- update(lm9,  ~ . - sqrt(X3PAr)); summary(lm10)
+lm11 <- update(lm10,  ~ . - log(FTr + 1)); summary(lm11)
+lm12 <- update(lm11,  ~ . - USG.); summary(lm12)
+lm13 <- update(lm12,  ~ . - log(BLK + 20)); summary(lm13)
+lm14 <- update(lm13,  ~ . - sqrt(STL +20)); summary(lm14)
+lm15 <- update(lm14,  ~ . - log(AST. + 1)); summary(lm15)
+lm16 <- update(lm15,  ~ . - BPM); summary(lm16)
+lm17 <- update(lm16,  ~ . - log(TOV.+20)); summary(lm17)
+lm18 <- update(lm17,  ~ . - sqrt(BLK.)); summary(lm18)
 
-#
+summary(lm6);summary(lm18)
+performance::check_model(lm6)
+performance::check_model(lm18)
 
 
