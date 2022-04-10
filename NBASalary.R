@@ -155,12 +155,12 @@ summary(lm19); performance::check_model(lm19)
 lm20 <- step(lm4, k = log(n))
 summary(lm20); performance::check_model(lm20)
 
-lm21 <- step(lm2, k = log(n)) # best adj r^2
-summary(lm21); performance::check_model(lm21)
-lm21a <- update(lm21,~.-log(eFG.+20))# worse
-lm21b <- update(lm21a,~.-FG.) # worse
-lm21c <- update(lm21b,~.-sqrt(X3PAr)) # worse
-lm21d <- update(lm21c,~.-sqrt(DWS+20)) # worse
+lm21 <- step(lm2, k = log(n)) 
+summary(lm21); performance::check_model(lm21)# best adj r^2 but high collinearity
+lm21a <- update(lm21,~.-log(eFG.+20))# insignificant predictors but no collinearity
+lm21b <- update(lm21a,~.-FG.) # no collinearity, all significant predictors, second highest adj r^2
+lm21c <- update(lm21b,~.-sqrt(X3PAr)) # no collinearity, all significant predictors, worse adj r^2
+lm21d <- update(lm21c,~.-sqrt(DWS+20)) # no collinearity, all significant predictors, worst adj r^2
 summary(lm21d); performance::check_model(lm21d)
 
 ##################################lm21; need to address if backwards stepwise selection has to START from full model containing all p predictors (instead of partial model)
