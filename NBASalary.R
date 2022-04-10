@@ -31,10 +31,18 @@ d <- melt(final_data, id="season17_18")
 ggplot(d,aes(x=variable,y=value,color=variable)) +
   geom_boxplot() +
   theme(axis.text.x = element_text(size=10, angle=45))
-dt <- final_data[,c(1,2,3,5,6,10)]
+dt <- final_data[,c(1,2,3,5,9,19,36)]
+dt1 <- final_data[,c(1,2,3)]
+dt2 <- final_data[,c(1,5,36)]
+dt3 <- final_data[,c(1,9,19)]
 e <- melt(dt,id="season17_18")
-ggplot(e,aes(x=variable,y=value,color=variable)) +
-  geom_boxplot()
+e1 <- melt(dt1,id="season17_18")
+e2 <- melt(dt2,id="season17_18")
+e3 <- melt(dt3,id="season17_18")
+ggplot(e,aes(x=variable,y=value)) + geom_boxplot()
+ggplot(e1,aes(x=variable,y=value)) + geom_boxplot()
+ggplot(e2,aes(x=variable,y=value)) + geom_boxplot()
+ggplot(e3,aes(x=variable,y=value)) + geom_boxplot()
 
 
 # Fit the regression, summarize and check assumptions
@@ -74,8 +82,6 @@ corr_pairs <- matrix(corr_vals, ncol = 2, byrow = TRUE); corr_pairs
 # Linear model with our first set of rejects (based on high colinearity & lower correlation with the response variable)
 lm3 <- update(lm2, ~. - log(eFG. + 20) - log(TRB. + 1) - log(OWS + 20) - sqrt(FG + 20) - sqrt(X2P + 20) - sqrt(X2PA + 20) - log(FT + 20) - 
                 sqrt(TRB + 20) - sqrt(X3PA + 20) - sqrt(FGA)); summary(lm3); performance::check_model(lm3)
-
-############ Next time do lm before lm4 that removes the negative correlations b/w (-1,-.9] ###############
 
 # Scan the upper right triangle of the correlation matrix. Print indeces that have correlation values greater than .83 and less than .9
 corr_vals2 <- c()
@@ -142,4 +148,83 @@ summary(lm6);summary(lm18)
 performance::check_model(lm6)
 performance::check_model(lm18)
 
+
+lm19 <- step(lm3, k = log(n))
+summary(lm19); performance::check_model(lm19)
+
+lm20 <- step(lm4, k = log(n))
+summary(lm20); performance::check_model(lm20)
+
+lm21 <- step(lm2, k = log(n))
+summary(lm21); performance::check_model(lm21) # not considered in anova due to collinearity issues
+
+
+anova(lm3,lm2) # keep lm3
+anova(lm4,lm2) # use lm2
+anova(lm5,lm2) # use lm2
+anova(lm6,lm2) # use lm2
+anova(lm7,lm2) # use lm2
+anova(lm8,lm2) # use lm2
+anova(lm9,lm2) # use lm2
+anova(lm10,lm2) # use lm2
+anova(lm11,lm2) # use lm2
+anova(lm12,lm2) # use lm2
+anova(lm13,lm2) # use lm2
+anova(lm14,lm2) # keep lm14
+anova(lm15,lm2) # keep lm15
+anova(lm16,lm2) # keep lm16
+anova(lm17,lm2) # keep lm17
+anova(lm18,lm2) # keep lm18
+anova(lm19,lm2) # keep lm19
+anova(lm20,lm2) # use lm2
+
+# Nhi thinks lm19 is best model for the following reasons:
+# no high collinearity & meets normality, linearity, and constant variance assumptions
+# std residuals are within 2 standard deviations so no high leverage points or outliers
+# intercept is highly significant
+# partial f-test has high p-value indicating to not reject the null hypothesis that $H_0: \beta_# =\beta_# ...=\beta_# = 0$
+# So we can accept the reduced model lm19
+
+s2 <- summary(lm2)
+s3 <- summary(lm3)
+s4 <- summary(lm4)
+s5 <- summary(lm5)
+s6 <- summary(lm6)
+s7 <- summary(lm7)
+s8 <- summary(lm8)
+s9 <- summary(lm9)
+s10 <- summary(lm10)
+s11 <- summary(lm11)
+s12 <- summary(lm12)
+s13 <- summary(lm13)
+s14 <- summary(lm14)
+s15 <- summary(lm15)
+s16 <- summary(lm16)
+s17 <- summary(lm17)
+s18 <- summary(lm18)
+s19 <- summary(lm19)
+s20 <- summary(lm20)
+
+s2$adj.r.squared
+s3$adj.r.squared
+s4$adj.r.squared
+s5$adj.r.squared
+s6$adj.r.squared
+s7$adj.r.squared
+s8$adj.r.squared
+s9$adj.r.squared
+s10$adj.r.squared
+s11$adj.r.squared
+s12$adj.r.squared
+s13$adj.r.squared
+s14$adj.r.squared
+s15$adj.r.squared
+s16$adj.r.squared
+s17$adj.r.squared
+s18$adj.r.squared
+s19$adj.r.squared
+s20$adj.r.squared
+
+# From highest adjusted r squared to lowest r squared
+# 1m19,lm2,lm3...lm5
 
