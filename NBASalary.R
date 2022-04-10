@@ -155,9 +155,15 @@ summary(lm19); performance::check_model(lm19)
 lm20 <- step(lm4, k = log(n))
 summary(lm20); performance::check_model(lm20)
 
-lm21 <- step(lm2, k = log(n))
-summary(lm21); performance::check_model(lm21) # not considered in anova due to collinearity issues
+lm21 <- step(lm2, k = log(n)) # best adj r^2
+summary(lm21); performance::check_model(lm21)
+lm21a <- update(lm21,~.-log(eFG.+20))# worse
+lm21b <- update(lm21a,~.-FG.) # worse
+lm21c <- update(lm21b,~.-sqrt(X3PAr)) # worse
+lm21d <- update(lm21c,~.-sqrt(DWS+20)) # worse
+summary(lm21d); performance::check_model(lm21d)
 
+##################################lm21; need to address if backwards stepwise selection has to START from full model containing all p predictors (instead of partial model)
 
 anova(lm3,lm2) # keep lm3
 anova(lm4,lm2) # use lm2
