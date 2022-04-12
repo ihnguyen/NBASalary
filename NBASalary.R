@@ -152,6 +152,7 @@ performance::check_model(lm18)
 lm19 <- step(lm3, k = log(n))
 summary(lm19); performance::check_model(lm19)
 
+
 lm20 <- step(lm4, k = log(n))
 summary(lm20); performance::check_model(lm20)
 
@@ -163,7 +164,6 @@ lm21c <- update(lm21b,~.-sqrt(X3PAr)) # no collinearity, all significant predict
 lm21d <- update(lm21c,~.-sqrt(DWS+20)) # no collinearity, all significant predictors, worst adj r^2
 summary(lm21d); performance::check_model(lm21d)
 
-##################################lm21; need to address if backwards stepwise selection has to START from full model containing all p predictors (instead of partial model)
 
 anova(lm3,lm2) # keep lm3
 anova(lm4,lm2) # use lm2
@@ -233,4 +233,19 @@ s20$adj.r.squared
 
 # From highest adjusted r squared to lowest r squared
 # 1m19,lm2,lm3...lm5
+
+
+# Predicting Steph Curry's 2022 salary
+pred_curry <- predict(lm19,newdata = data.frame(DWS=11.1,Age=34,G=64,MP=2211,FTr=275,FTA=298), interval="prediction")
+pred_curry^4
+#fit     lwr      upr
+#25067.28 5811491 30417583
+#Steph Curry is getting paid 45,780,000 but the predicted salary was between 5,811,491 and 30,417,583
+
+# Predicting Damian Lillard's 2022 salary
+pred_dame <- predict(lm19,newdata = data.frame(DWS=1.7,Age=31,G=29,MP=1056,FTr=159,FTA=181), interval="prediction")
+pred_dame^4
+#fit      lwr     upr
+# 6344 17440850 4786676
+#Damian Lillard is getting paid 39,344,900 but the predicted salary was between 17,440,850 and 4,786,676
 
