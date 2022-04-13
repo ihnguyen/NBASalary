@@ -31,10 +31,10 @@ d <- melt(final_data, id="season17_18")
 ggplot(d,aes(x=variable,y=value,color=variable)) +
   geom_boxplot() +
   theme(axis.text.x = element_text(size=10, angle=45))
-dt <- final_data[,c(1,2,3,5,9,19,36)]
+dt <- final_data[,c(1,2,3,8,19,27)]
 dt1 <- final_data[,c(1,2,3)]
-dt2 <- final_data[,c(1,5,36)]
-dt3 <- final_data[,c(1,9,19)]
+dt2 <- final_data[,c(1,8,19)]
+dt3 <- final_data[,c(1,27)]
 e <- melt(dt,id="season17_18")
 e1 <- melt(dt1,id="season17_18")
 e2 <- melt(dt2,id="season17_18")
@@ -43,6 +43,8 @@ ggplot(e,aes(x=variable,y=value)) + geom_boxplot()
 ggplot(e1,aes(x=variable,y=value)) + geom_boxplot()
 ggplot(e2,aes(x=variable,y=value)) + geom_boxplot()
 ggplot(e3,aes(x=variable,y=value)) + geom_boxplot()
+
+
 
 
 # Fit the regression, summarize and check assumptions
@@ -186,6 +188,7 @@ anova(lm17,lm2) # keep lm17
 anova(lm18,lm2) # keep lm18
 anova(lm19,lm2) # keep lm19
 anova(lm20,lm2) # use lm2
+anova(lm21b,lm2) # keep lm21b
 
 
 s2 <- summary(lm2)
@@ -252,3 +255,4 @@ range(log(final_data$FTr)+4)
 range(sqrt(final_data$DWS+20))
 range(log(final_data$FTA)+6)
 
+pairs((season17_18^0.25)~Age+G+sqrt(X3PAr)+sqrt(DWS+20)+sqrt(FGA), data=final_data)
