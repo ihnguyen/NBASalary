@@ -165,8 +165,8 @@ lm21c <- update(lm21b,~.-sqrt(X3PAr))
 lm21d <- update(lm21c,~.-sqrt(DWS+20))
 summary(lm21); performance::check_model(lm21)
 summary(lm21a); performance::check_model(lm21a)
-summary(lm21b); performance::check_model(lm21b) # best
-summary(lm21c); performance::check_model(lm21c)
+summary(lm21b); performance::check_model(lm21b)
+summary(lm21c); performance::check_model(lm21c) ##
 summary(lm21d); performance::check_model(lm21d)
 
 
@@ -233,14 +233,14 @@ s20$adj.r.squared
 
 
 
-# Predicting Steph Curry's 2022 salary
+# Predicting Steph Curry's 2021-22 salary
 pred_curry <- predict(lm21b,newdata = data.frame(Age=34,G=64,X3PAr=285/750,DWS=11.1,FGA=1224), interval="prediction")
 pred_curry^4
 #fit      lwr       upr
 # 107156311 38834036 240604218
 #Steph Curry is getting paid 45,780,000 which is within the prediction interval 38,834,036 and 240,604,218
 
-# Predicting Damian Lillard's 2022 salary
+# Predicting Damian Lillard's 2021-22 salary
 pred_dame <- predict(lm21b,newdata = data.frame(Age=31,G=29,X3PAr=92/284,DWS=1.7,FGA=552), interval="prediction")
 pred_dame^4
 #fit     lwr      upr
@@ -254,5 +254,38 @@ range(final_data$MP)
 range(log(final_data$FTr)+4)
 range(sqrt(final_data$DWS+20))
 range(log(final_data$FTA)+6)
+range(sqrt(final_data$X3PAr))
 
 pairs((season17_18^0.25)~Age+G+sqrt(X3PAr)+sqrt(DWS+20)+sqrt(FGA), data=final_data)
+
+library(caret)
+set.seed(111)
+n <- nrow(final_data);n
+z <- floor(0.7*n)
+train <- sample(1:n, z)
+test_data <- final_data[-train,]
+
+lm_train <- lm((season17_18^0.25)~Age+G+sqrt(DWS+20)+sqrt(FGA), data=final_data, subset=train); summary(lm_train)
+lm_train1 <- lm((season17_18)^0.25~Age+G+GS+MP+PER+TS.+sqrt(X3PAr)+log(FTr+4)+log(ORB.+1)+DRB.+log(TRB.+1)+log(AST.+1)+STL.+sqrt(BLK.)
+                + log(TOV.+ 20) + USG. + log(OWS+ 20) + sqrt(DWS+ 20) + sqrt(WS+ 20) + WS.48 + sqrt(OBPM + 20) + sqrt(DBPM + 20) + BPM + log(VORP+ 20) + sqrt(FG+ 20) + FG.+ sqrt(FGA) + sqrt(X3PA+ 20) + sqrt(X2P+ 20) + 
+                  sqrt(X2PA+ 20) + log(X2P.+ 20) + log(eFG.+ 20) + log(FT+ 20) + log(FTA +6) + FT. + log(ORB+ 20) + sqrt(DRB+ 20) + sqrt(TRB+ 20) + log(AST+ 20) + sqrt(STL+ 20) + log(BLK+ 20) + sqrt(TOV+ 20) + PF + sqrt(PTS+ 20)
+                , data=final_data, subset=train)
+summary(lm_train)
+
+predictions <- lm_train %>% predict(test_data)
+data.frame(RMSE = RMSE(predictions, test_data$season17_18))
+
+predictions1 <- lm_train1 %>% predict(test_data)
+data.frame(RMSE = RMSE(predictions1, test_data$season17_18))
+
+
+
+
+
+
+
+
+
+
+
+
