@@ -49,7 +49,7 @@ ggplot(e3,aes(x=variable,y=value)) + geom_boxplot()
 lm1 <- lm(season17_18 ~ ., data = final_data); summary(lm1);performance::check_model(lm1)
 
 # Model with transformed predictors
-lm2 <- lm((season17_18)^0.25~Age+G+GS+MP+PER+TS.+sqrt(X3PAr)+log(FTr+1)+log(ORB.+1)+DRB.+log(TRB.+1)+log(AST.+1)+STL.+sqrt(BLK.)
+lm2 <- lm((season17_18)^0.25~Age+G+GS+MP+PER+TS.+sqrt(X3PAr)+log(FTr+4)+log(ORB.+1)+DRB.+log(TRB.+1)+log(AST.+1)+STL.+sqrt(BLK.)
           + log(TOV.+ 20) + USG. + log(OWS+ 20) + sqrt(DWS+ 20) + sqrt(WS+ 20) + WS.48 + sqrt(OBPM + 20) + sqrt(DBPM + 20) + BPM + log(VORP+ 20) + sqrt(FG+ 20) + FG.+ sqrt(FGA) + sqrt(X3PA+ 20) + sqrt(X2P+ 20) + 
             sqrt(X2PA+ 20) + log(X2P.+ 20) + log(eFG.+ 20) + log(FT+ 20) + log(FTA +6) + FT. + log(ORB+ 20) + sqrt(DRB+ 20) + sqrt(TRB+ 20) + log(AST+ 20) + sqrt(STL+ 20) + log(BLK+ 20) + sqrt(TOV+ 20) + PF + sqrt(PTS+ 20)
           , data=final_data); summary(lm2); performance::check_model(lm2)
@@ -157,11 +157,14 @@ lm20 <- step(lm4, k = log(n))
 summary(lm20); performance::check_model(lm20)
 
 lm21 <- step(lm2, k = log(n)) 
-summary(lm21); performance::check_model(lm21)# best adj r^2 but high collinearity
-lm21a <- update(lm21,~.-log(eFG.+20))# insignificant predictors but no collinearity
-lm21b <- update(lm21a,~.-FG.) # no collinearity, all significant predictors, second highest adj r^2
-lm21c <- update(lm21b,~.-sqrt(X3PAr)) # no collinearity, all significant predictors, worse adj r^2
-lm21d <- update(lm21c,~.-sqrt(DWS+20)) # no collinearity, all significant predictors, worst adj r^2
+lm21a <- update(lm21,~.-log(eFG.+20))
+lm21b <- update(lm21a,~.-FG.)
+lm21c <- update(lm21b,~.-sqrt(X3PAr))
+lm21d <- update(lm21c,~.-sqrt(DWS+20))
+summary(lm21); performance::check_model(lm21)
+summary(lm21a); performance::check_model(lm21a)
+summary(lm21b); performance::check_model(lm21b) # best
+summary(lm21c); performance::check_model(lm21c)
 summary(lm21d); performance::check_model(lm21d)
 
 
@@ -184,12 +187,6 @@ anova(lm18,lm2) # keep lm18
 anova(lm19,lm2) # keep lm19
 anova(lm20,lm2) # use lm2
 
-# Nhi thinks lm19 is best model for the following reasons:
-# no high collinearity & meets normality, linearity, and constant variance assumptions
-# std residuals are within 2 standard deviations so no high leverage points or outliers
-# intercept is highly significant
-# partial f-test has high p-value indicating to not reject the null hypothesis that $H_0: \beta_# =\beta_# ...=\beta_# = 0$
-# So we can accept the reduced model lm19
 
 s2 <- summary(lm2)
 s3 <- summary(lm3)
@@ -231,21 +228,27 @@ s18$adj.r.squared
 s19$adj.r.squared
 s20$adj.r.squared
 
-# From highest adjusted r squared to lowest r squared
-# 1m19,lm2,lm3...lm5
 
 
 # Predicting Steph Curry's 2022 salary
-pred_curry <- predict(lm19,newdata = data.frame(DWS=11.1,Age=34,G=64,MP=2211,FTr=275,FTA=298), interval="prediction")
+pred_curry <- predict(lm21b,newdata = data.frame(Age=34,G=64,X3PAr=285/750,DWS=11.1,FGA=1224), interval="prediction")
 pred_curry^4
-#fit     lwr      upr
-#25067.28 5811491 30417583
-#Steph Curry is getting paid 45,780,000 but the predicted salary was between 5,811,491 and 30,417,583
+#fit      lwr       upr
+# 107156311 38834036 240604218
+#Steph Curry is getting paid 45,780,000 which is within the prediction interval 38,834,036 and 240,604,218
 
 # Predicting Damian Lillard's 2022 salary
-pred_dame <- predict(lm19,newdata = data.frame(DWS=1.7,Age=31,G=29,MP=1056,FTr=159,FTA=181), interval="prediction")
+pred_dame <- predict(lm21b,newdata = data.frame(Age=31,G=29,X3PAr=92/284,DWS=1.7,FGA=552), interval="prediction")
 pred_dame^4
-#fit      lwr     upr
-# 6344 17440850 4786676
-#Damian Lillard is getting paid 39,344,900 but the predicted salary was between 17,440,850 and 4,786,676
+#fit     lwr      upr
+# 15523020 3358957 46837196
+#Damian Lillard is getting paid 39,344,900 which is within the prediction interval is 3,358,957 and 46,837,196
+
+range(final_data$season17_18^0.25)
+range(final_data$Age)
+range(final_data$G)
+range(final_data$MP)
+range(log(final_data$FTr)+4)
+range(sqrt(final_data$DWS+20))
+range(log(final_data$FTA)+6)
 
