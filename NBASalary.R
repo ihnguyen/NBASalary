@@ -265,12 +265,13 @@ z <- floor(0.7*n)
 train <- sample(1:n, z)
 test_data <- final_data[-train,]
 
-lm_train <- lm((season17_18^0.25)~Age+G+sqrt(DWS+20)+sqrt(FGA), data=final_data, subset=train); summary(lm_train)
+lm_train <- lm((season17_18)^0.25~Age+G+sqrt(DWS+20)+sqrt(FGA), data=final_data, subset=train); summary(lm_train)
 lm_train1 <- lm((season17_18)^0.25~Age+G+GS+MP+PER+TS.+sqrt(X3PAr)+log(FTr+4)+log(ORB.+1)+DRB.+log(TRB.+1)+log(AST.+1)+STL.+sqrt(BLK.)
                 + log(TOV.+ 20) + USG. + log(OWS+ 20) + sqrt(DWS+ 20) + sqrt(WS+ 20) + WS.48 + sqrt(OBPM + 20) + sqrt(DBPM + 20) + BPM + log(VORP+ 20) + sqrt(FG+ 20) + FG.+ sqrt(FGA) + sqrt(X3PA+ 20) + sqrt(X2P+ 20) + 
                   sqrt(X2PA+ 20) + log(X2P.+ 20) + log(eFG.+ 20) + log(FT+ 20) + log(FTA +6) + FT. + log(ORB+ 20) + sqrt(DRB+ 20) + sqrt(TRB+ 20) + log(AST+ 20) + sqrt(STL+ 20) + log(BLK+ 20) + sqrt(TOV+ 20) + PF + sqrt(PTS+ 20)
                 , data=final_data, subset=train)
 summary(lm_train)
+summary(lm_train1)
 
 predictions <- lm_train %>% predict(test_data)
 data.frame(RMSE = RMSE(predictions, test_data$season17_18))
