@@ -61,7 +61,6 @@ ptf<- powerTransform(season17_18~.,data = final_data)
 summary(ptf)
 
 
-
 # Correlation matrix as a data frame
 corr_df <- round(cor(final_data[,1:46]),2)
 
@@ -189,6 +188,7 @@ anova(lm18,lm2) # keep lm18
 anova(lm19,lm2) # keep lm19
 anova(lm20,lm2) # use lm2
 anova(lm21b,lm2) # keep lm21b
+anova(lm21c,lm2) # keep lm21c
 
 
 s2 <- summary(lm2)
@@ -234,14 +234,14 @@ s20$adj.r.squared
 
 
 # Predicting Steph Curry's 2021-22 salary
-pred_curry <- predict(lm21b,newdata = data.frame(Age=34,G=64,X3PAr=285/750,DWS=11.1,FGA=1224), interval="prediction")
+pred_curry <- predict(lm21c,newdata = data.frame(Age=34,G=64,DWS=11.1,FGA=1224), interval="prediction")
 pred_curry^4
 #fit      lwr       upr
 # 107156311 38834036 240604218
 #Steph Curry is getting paid 45,780,000 which is within the prediction interval 38,834,036 and 240,604,218
 
 # Predicting Damian Lillard's 2021-22 salary
-pred_dame <- predict(lm21b,newdata = data.frame(Age=31,G=29,X3PAr=92/284,DWS=1.7,FGA=552), interval="prediction")
+pred_dame <- predict(lm21c,newdata = data.frame(Age=31,G=29,DWS=1.7,FGA=552), interval="prediction")
 pred_dame^4
 #fit     lwr      upr
 # 15523020 3358957 46837196
@@ -256,7 +256,7 @@ range(sqrt(final_data$DWS+20))
 range(log(final_data$FTA)+6)
 range(sqrt(final_data$X3PAr))
 
-pairs((season17_18^0.25)~Age+G+sqrt(X3PAr)+sqrt(DWS+20)+sqrt(FGA), data=final_data)
+pairs((season17_18^0.25)~Age+G+sqrt(DWS+20)+sqrt(FGA), data=final_data)
 
 library(caret)
 set.seed(111)
@@ -273,20 +273,16 @@ lm_train1 <- lm((season17_18)^0.25~Age+G+GS+MP+PER+TS.+sqrt(X3PAr)+log(FTr+4)+lo
 summary(lm_train)
 summary(lm_train1)
 
+
 predictions <- lm_train %>% predict(test_data)
-data.frame(RMSE = RMSE(predictions, test_data$season17_18))
+data.frame(R2 = R2(predictions, test_data$season17_18),
+           RMSE = RMSE(predictions, test_data$season17_18),
+           MAE = MAE(predictions, test_data$season17_18))
 
 predictions1 <- lm_train1 %>% predict(test_data)
-data.frame(RMSE = RMSE(predictions1, test_data$season17_18))
+data.frame(R2 = R2(predictions1, test_data$season17_18),
+           RMSE = RMSE(predictions1, test_data$season17_18),
+           MAE = MAE(predictions1, test_data$season17_18))
 
-
-
-
-
-
-
-
-
-
-
-
+mean(final_data$season17_18)
+range(final_data$season17_18)
