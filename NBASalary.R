@@ -163,13 +163,13 @@ anova(lm4,lm2)
 # Perform backwards stepwise selection on lm3
 lm19 <- step(lm3, k = log(n))
 summary(lm19); performance::check_model(lm19)
-anova(lm19,lm2)
-anova(lm19,lm3)
 plot((final_data$season17_18)^0.25, resid(lm19), data=final_data)
 
 # Perform backwards elimination on lm19
 lm19a <- update(lm19,  ~ . - G); summary(lm19a);performance::check_model(lm19a) # insignificant predictors
 lm19b <- update(lm19a,  ~ . - log(FTr +4)); summary(lm19b);performance::check_model(lm19b) # collinearity issue
+lm19c <- update(lm19,  ~ . - MP); summary(lm19c);performance::check_model(lm19c)
+
 
 # Observed versus fitted values diagnostic plot of DWS transformation
 par(mfrow=c(1,2))
@@ -214,12 +214,16 @@ anova(lm16,lm2) # use lm2
 anova(lm17,lm2) # use lm2
 anova(lm18,lm2) # use lm2
 anova(lm19,lm2) # keep lm19 ----- high p-value
+anova(lm19a,lm2) # use lm2
+anova(lm19b,lm2) # use lm2
+anova(lm19c,lm2) # use lm2
 anova(lm20,lm2) # use lm2
 anova(lm21,lm2) # keep lm21 ----- high p-value
 anova(lm21a,lm2)# keep lm21a
 anova(lm21b,lm2) # keep lm21b
 anova(lm21c,lm2) # keep lm21c
 anova(lm21d,lm2) # use lm2
+
 
 # Assign models to a name
 s2 <- summary(lm2)
@@ -319,16 +323,18 @@ z <- floor(0.7*n)
 train <- sample(1:n, z)
 test_data <- final_data[-train,]
 
-# Train models lm21c (lm_train), full model (lm_train1), and lm19 (lm_train2)
+# Train models lm21c (lm_train), full model (lm_train1), lm19 (lm_train2), and lm21 (lm_train3)
 lm_train <- lm((season17_18)^0.25~Age+G+sqrt(DWS+20)+sqrt(FGA), data=final_data, subset=train)
 lm_train1 <- lm((season17_18)^0.25~Age+G+GS+MP+PER+TS.+sqrt(X3PAr)+log(FTr+4)+log(ORB.+1)+DRB.+log(TRB.+1)+log(AST.+1)+STL.+sqrt(BLK.)
                 + log(TOV.+ 20) + USG. + log(OWS+ 20) + sqrt(DWS+ 20) + sqrt(WS+ 20) + WS.48 + sqrt(OBPM + 20) + sqrt(DBPM + 20) + BPM + log(VORP+ 20) + sqrt(FG+ 20) + FG.+ sqrt(FGA) + sqrt(X3PA+ 20) + sqrt(X2P+ 20) + 
                   sqrt(X2PA+ 20) + log(X2P.+ 20) + log(eFG.+ 20) + log(FT+ 20) + log(FTA +6) + FT. + log(ORB+ 20) + sqrt(DRB+ 20) + sqrt(TRB+ 20) + log(AST+ 20) + sqrt(STL+ 20) + log(BLK+ 20) + sqrt(TOV+ 20) + PF + sqrt(PTS+ 20)
                 , data=final_data, subset=train)
 lm_train2 <- lm((season17_18)^0.25 ~ Age + G + MP + log(FTr + 4) + sqrt(DWS +20) + log(FTA + 6), data=final_data, subset=train)
+lm_train3 <- lm((season17_18)^0.25 ~ Age + G + sqrt(X3PAr) + sqrt(DWS +20) + FG. + sqrt(FGA) + log(eFG. + 20), data = final_data, subset=train)
 summary(lm_train)
 summary(lm_train1)
 summary(lm_train2)
+summary(lm_train3)
 
 predictions <- lm_train %>% predict(test_data)
 data.frame(R2 = R2(predictions, test_data$season17_18),
@@ -344,14 +350,20 @@ predictions2 <- lm_train2 %>% predict(test_data)
 data.frame(R2 = R2(predictions2, test_data$season17_18),
            RMSE = RMSE(predictions2, test_data$season17_18),
            MAE = MAE(predictions2, test_data$season17_18))
-# Same RMSE for all models 
+
+predictions3 <- lm_train3 %>% predict(test_data)
+data.frame(R2 = R2(predictions3, test_data$season17_18),
+           RMSE = RMSE(predictions3, test_data$season17_18),
+           MAE = MAE(predictions3, test_data$season17_18))
+# Same RMSE for all models except lm21 (lm_train3) is one less
 
 
 # Manually calculate RMSE
 sqrt((sum((test_data$season17_18 - predictions)^2))/(n-z))
 sqrt((sum((test_data$season17_18 - predictions1)^2))/(n-z))
 sqrt((sum((test_data$season17_18 - predictions2)^2))/(n-z))
-# Same RMSE for all models
+sqrt((sum((test_data$season17_18 - predictions3)^2))/(n-z))
+# Same RMSE for all models except lm21 (lm_train3) is one less
 
 # Run predictions to ensure different predictions from different models
 pred_dame1 <- predict(lm21b,newdata = data.frame(Age=26,G=75.000000,X3PAr = 0.3880000,DWS = 1.50000000,FG. = 0.4440000 , FGA=1488.000000), interval="prediction")
@@ -363,3 +375,19 @@ pred_dame2^4
 pred_dame3 <- predict(lm21d,newdata = data.frame(Age=26,G=75.000000, FGA=1488.000000), interval="prediction")
 pred_dame3^4
 # Damian Lillard's 2017-18 salary is 26,153,057
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
