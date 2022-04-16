@@ -1,10 +1,11 @@
+# Load libraries
 library(tidyverse);library(car);library(emmeans);library(MASS);library(reshape);library(reshape2);library(faraway)
 
 # Read csv files
 salary_data <- read.csv("NBA_season1718_salary.csv"); stats_data <- read.csv("Seasons_Stats.csv")
 dim(salary_data);dim(stats_data)
 
-# Full Join both data sets
+# Full join both data sets
 data0 <- salary_data %>% 
   full_join(.,stats_data, by=unique("Player")) %>% 
   subset(Year == 2017) %>% 
@@ -26,7 +27,7 @@ fdata <- data0 %>%
   na.omit(); dim(fdata); 403/486
 final_data <- data.frame(fdata)
 
-# Observe data using Box Plot
+# Observe data with statistically significant predictors using Box Plot
 d <- melt(final_data, id="season17_18")
 ggplot(d,aes(x=variable,y=value,color=variable)) +
   geom_boxplot() +
@@ -44,22 +45,24 @@ ggplot(e1,aes(x=variable,y=value)) + geom_boxplot()
 ggplot(e2,aes(x=variable,y=value)) + geom_boxplot()
 ggplot(e3,aes(x=variable,y=value)) + geom_boxplot()
 
-
-
-
 # Fit the regression, summarize and check assumptions
 lm1 <- lm(season17_18 ~ ., data = final_data); summary(lm1);performance::check_model(lm1)
 
-# Model with transformed predictors
-lm2 <- lm((season17_18)^0.25~Age+G+GS+MP+PER+TS.+sqrt(X3PAr)+log(FTr+4)+log(ORB.+1)+DRB.+log(TRB.+1)+log(AST.+1)+STL.+sqrt(BLK.)
-          + log(TOV.+ 20) + USG. + log(OWS+ 20) + sqrt(DWS+ 20) + sqrt(WS+ 20) + WS.48 + sqrt(OBPM + 20) + sqrt(DBPM + 20) + BPM + log(VORP+ 20) + sqrt(FG+ 20) + FG.+ sqrt(FGA) + sqrt(X3PA+ 20) + sqrt(X2P+ 20) + 
-            sqrt(X2PA+ 20) + log(X2P.+ 20) + log(eFG.+ 20) + log(FT+ 20) + log(FTA +6) + FT. + log(ORB+ 20) + sqrt(DRB+ 20) + sqrt(TRB+ 20) + log(AST+ 20) + sqrt(STL+ 20) + log(BLK+ 20) + sqrt(TOV+ 20) + PF + sqrt(PTS+ 20)
-          , data=final_data); summary(lm2); performance::check_model(lm2)
-# Check if response needs to be transformed; Box-Cox transformation
+# Check if response needs to be transformed using Box-Cox transformation
 par(mfrow=c(2,3));qqPlot(final_data$season17_18);qqPlot((final_data$season17_18)^0.25);hist(final_data$season17_18);hist((final_data$season17_18)^0.25);plot(final_data$season17_18,resid(lm2),data=final_data);plot((final_data$season17_18)^0.25,resid(lm2),data=final_data)
 ptf<- powerTransform(season17_18~.,data = final_data)
 summary(ptf)
 
+# Fit regression with transformed predictors (Full model)
+lm2 <- lm((season17_18)^0.25~Age+G+GS+MP+PER+TS.+sqrt(X3PAr)+log(FTr+4)+log(ORB.+1)+DRB.+log(TRB.+1)+log(AST.+1)+STL.+sqrt(BLK.)
+          + log(TOV.+ 20) + USG. + log(OWS+ 20) + sqrt(DWS+ 20) + sqrt(WS+ 20) + WS.48 + sqrt(OBPM + 20) + sqrt(DBPM + 20) + BPM + log(VORP+ 20) + sqrt(FG+ 20) + FG.+ sqrt(FGA) + sqrt(X3PA+ 20) + sqrt(X2P+ 20) + 
+            sqrt(X2PA+ 20) + log(X2P.+ 20) + log(eFG.+ 20) + log(FT+ 20) + log(FTA +6) + FT. + log(ORB+ 20) + sqrt(DRB+ 20) + sqrt(TRB+ 20) + log(AST+ 20) + sqrt(STL+ 20) + log(BLK+ 20) + sqrt(TOV+ 20) + PF + sqrt(PTS+ 20)
+          , data=final_data); summary(lm2); performance::check_model(lm2)
+
+# Is there a relationship between the response and at least one predictor in our regression model?
+null <- lm((season17_18)^0.25~1, data=final_data)
+anova(null,lm2)
+# Since the p-value is less than 0.05, we reject the null and conclude there is at least one predictor that is useful at predicting salary
 
 # Correlation matrix as a data frame
 corr_df <- round(cor(final_data[,1:46]),2)
@@ -80,9 +83,11 @@ colnames(corr_df)
 corr_pairs <- matrix(corr_vals, ncol = 2, byrow = TRUE); corr_pairs
 
 
-# Linear model with our first set of rejects (based on high colinearity & lower correlation with the response variable)
+# Linear model with our first set of rejects (based on high colinearity & lower correlation with the response variable) based on rho>0.9
 lm3 <- update(lm2, ~. - log(eFG. + 20) - log(TRB. + 1) - log(OWS + 20) - sqrt(FG + 20) - sqrt(X2P + 20) - sqrt(X2PA + 20) - log(FT + 20) - 
                 sqrt(TRB + 20) - sqrt(X3PA + 20) - sqrt(FGA)); summary(lm3); performance::check_model(lm3)
+anova(lm3,lm2)
+
 
 # Scan the upper right triangle of the correlation matrix. Print indeces that have correlation values greater than .83 and less than .9
 corr_vals2 <- c()
@@ -101,6 +106,7 @@ corr_pairs2
 lm4 <- update(lm3, ~. - G - MP - WS.48 - log(ORB. + 1) - sqrt(TRB + 20) - log(ORB + 20) - log(VORP + 20) - log(FTA + 6) - 
                 sqrt(OBPM + 20) - log(FT + 20) - sqrt(TOV + 20) - log(X2P. + 20) - FG. - sqrt(X2P + 20) - sqrt(X2PA + 20) -
                 log(AST + 20)); summary(lm4); performance::check_model(lm4)
+anova(lm4,lm2)
 
 plot((final_data$season17_18)^0.25, resid(lm4), data=final_data)
 round(vif(lm4),2)
@@ -152,10 +158,22 @@ performance::check_model(lm18)
 
 lm19 <- step(lm3, k = log(n))
 summary(lm19); performance::check_model(lm19)
+anova(lm19,lm2)
+anova(lm19,lm3)
+plot((final_data$season17_18)^0.25, resid(lm19), data=final_data)
+
+#Observed versus fitted values diagnostic plot of DWS transformation
+par(mfrow=c(1,2))
+plot(predict(lm19), sqrt(final_data$DWS+20), data=final_data)
+lines(lowess(predict(lm19),sqrt(final_data$DWS+20)), col='red')
+plot(predict(lm1), final_data$DWS, data=final_data)
+lines(lowess(predict(lm1),final_data$DWS), col='red')
 
 
 lm20 <- step(lm4, k = log(n))
 summary(lm20); performance::check_model(lm20)
+anova(lm20,lm2)
+plot((final_data$season17_18)^0.25, resid(lm20), data=final_data)
 
 lm21 <- step(lm2, k = log(n)) 
 lm21a <- update(lm21,~.-log(eFG.+20))
@@ -165,8 +183,9 @@ lm21d <- update(lm21c,~.-sqrt(DWS+20))
 summary(lm21); performance::check_model(lm21)
 summary(lm21a); performance::check_model(lm21a)
 summary(lm21b); performance::check_model(lm21b)
-summary(lm21c); performance::check_model(lm21c) ##
+summary(lm21c); performance::check_model(lm21c)
 summary(lm21d); performance::check_model(lm21d)
+plot((final_data$season17_18)^0.25, resid(lm21c), data=final_data)
 
 
 anova(lm3,lm2) # keep lm3
@@ -187,9 +206,11 @@ anova(lm17,lm2) # keep lm17
 anova(lm18,lm2) # keep lm18
 anova(lm19,lm2) # keep lm19
 anova(lm20,lm2) # use lm2
+anova(lm21,lm2) # keep lm21
+anova(lm21a,lm2)# keep lm21a
 anova(lm21b,lm2) # keep lm21b
 anova(lm21c,lm2) # keep lm21c
-
+anova(lm21d,lm2) # use lm2
 
 s2 <- summary(lm2)
 s3 <- summary(lm3)
@@ -231,16 +252,24 @@ s18$adj.r.squared
 s19$adj.r.squared
 s20$adj.r.squared
 
+# Predicting Steph Curry's and Damian Lillard's 2017-18 salary with lm19
+pred_curry0 <- predict(lm19,newdata = data.frame(Age=28,G=79.000000,MP=2638.0000, FTr=0.25100000,DWS=3.90000000,FTA=362.000000), interval="prediction")
+pred_curry0^4
+#fit     lwr      upr
+#1 23,517,044 6,187,195 63,883,223
+#34,682,550
+pred_dame0 <- predict(lm19,newdata = data.frame(Age=26,G=75.000000,MP=2694.00000, FTr=0.3660000,DWS=1.50000000,FTA=545.000000), interval="prediction")
+pred_dame0^4
+#fit     lwr      upr
+#1 16,455,663 3,704,547 48,636,950
+#26,153,057
 
-
-# Predicting Steph Curry's 2021-22 salary
+# Predicting Steph Curry's and Damian Lillard's 2021-22 salary with lm21c
 pred_curry <- predict(lm21c,newdata = data.frame(Age=34,G=64,DWS=11.1,FGA=1224), interval="prediction")
 pred_curry^4
 #fit      lwr       upr
 # 107156311 38834036 240604218
 #Steph Curry is getting paid 45,780,000 which is within the prediction interval 38,834,036 and 240,604,218
-
-# Predicting Damian Lillard's 2021-22 salary
 pred_dame <- predict(lm21c,newdata = data.frame(Age=31,G=29,DWS=1.7,FGA=552), interval="prediction")
 pred_dame^4
 #fit     lwr      upr
@@ -257,6 +286,7 @@ range(log(final_data$FTA)+6)
 range(sqrt(final_data$X3PAr))
 
 pairs((season17_18^0.25)~Age+G+sqrt(DWS+20)+sqrt(FGA), data=final_data)
+pairs((season17_18)^0.25 ~ Age + G + MP + log(FTr + 4) + sqrt(DWS +20) + log(FTA + 6), data=final_data)
 
 library(caret)
 set.seed(111)
@@ -272,9 +302,10 @@ lm_train1 <- lm((season17_18)^0.25~Age+G+GS+MP+PER+TS.+sqrt(X3PAr)+log(FTr+4)+lo
                 + log(TOV.+ 20) + USG. + log(OWS+ 20) + sqrt(DWS+ 20) + sqrt(WS+ 20) + WS.48 + sqrt(OBPM + 20) + sqrt(DBPM + 20) + BPM + log(VORP+ 20) + sqrt(FG+ 20) + FG.+ sqrt(FGA) + sqrt(X3PA+ 20) + sqrt(X2P+ 20) + 
                   sqrt(X2PA+ 20) + log(X2P.+ 20) + log(eFG.+ 20) + log(FT+ 20) + log(FTA +6) + FT. + log(ORB+ 20) + sqrt(DRB+ 20) + sqrt(TRB+ 20) + log(AST+ 20) + sqrt(STL+ 20) + log(BLK+ 20) + sqrt(TOV+ 20) + PF + sqrt(PTS+ 20)
                 , data=final_data, subset=train)
-
+lm_train2 <- lm((season17_18)^0.25 ~ Age + G + MP + log(FTr + 4) + sqrt(DWS +20) + log(FTA + 6), data=final_data, subset=train)
 summary(lm_train)
 summary(lm_train1)
+summary(lm_train2)
 
 #RMSE function gives the same values for both models 
 predictions <- lm_train %>% predict(test_data)
@@ -287,22 +318,28 @@ data.frame(R2 = R2(predictions1, test_data$season17_18),
            RMSE = RMSE(predictions1, test_data$season17_18),
            MAE = MAE(predictions1, test_data$season17_18))
 
+predictions2 <- lm_train2 %>% predict(test_data)
+data.frame(R2 = R2(predictions2, test_data$season17_18),
+           RMSE = RMSE(predictions2, test_data$season17_18),
+           MAE = MAE(predictions2, test_data$season17_18))
+
 mean(final_data$season17_18)
 range(final_data$season17_18)
 
 # Manual RMSE of lm_train and lm_train2 still gives the same values
 sqrt((sum((test_data$season17_18 - predictions)^2))/(n-z))
 sqrt((sum((test_data$season17_18 - predictions1)^2))/(n-z))
+sqrt((sum((test_data$season17_18 - predictions2)^2))/(n-z))
 
 
 
 # We ran predictions here just to ensure that we are indeed getting different predictions from our different models
-pred_dame1 <- predict(lm21b,newdata = data.frame(Age=31,G=29,X3PAr = 0.3880000,DWS = 1.50000000,FG. = 0.4440000 , FGA=552), interval="prediction")
+pred_dame1 <- predict(lm21b,newdata = data.frame(Age=26,G=75.000000,X3PAr = 0.3880000,DWS = 1.50000000,FG. = 0.4440000 , FGA=1488.000000), interval="prediction")
 pred_dame1^4
 
-pred_dame2 <- predict(lm21c,newdata = data.frame(Age=31,G=29,X3PAr = 0.3880000,DWS = 1.50000000, FGA=552), interval="prediction")
+pred_dame2 <- predict(lm21c,newdata = data.frame(Age=26,G=75.000000,X3PAr = 0.3880000,DWS = 1.50000000, FGA=1488.000000), interval="prediction")
 pred_dame2^4
 
-#Still need to edit variables inside function
-pred_dame3 <- predict(lm21d,newdata = data.frame(Age=31,G=29,X3PAr = 0.3880000,DWS = 1.50000000, FGA=552), interval="prediction")
-pred_dame2^4
+pred_dame3 <- predict(lm21d,newdata = data.frame(Age=26,G=75.000000, FGA=1488.000000), interval="prediction")
+pred_dame3^4
+# Damian Lillard's 2017-18 salary is 26,153,057
