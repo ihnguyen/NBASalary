@@ -31,23 +31,73 @@ final_data <- data.frame(fdata)
 mean(final_data$season17_18)
 range(final_data$season17_18)
 
-# Observe data with statistically significant predictors using Box Plot
+# Explore explanatory variables
+range(final_data$G)
+range(final_data$GS)
+range(final_data$MP)
+range(final_data$PER)
+range(final_data$TS.)
+range(final_data$X3PAr)
+range(final_data$FTr) # incorrect data that are greater than 1
+range(final_data$ORB.)
+range(final_data$DRB.)
+range(final_data$TRB.)
+range(final_data$AST.)
+range(final_data$STL.)
+range(final_data$BLK.)
+range(final_data$TOV.)
+range(final_data$USG.)
+range(final_data$OWS)
+range(final_data$DWS)
+range(final_data$WS)
+range(final_data$WS.48)
+range(final_data$OBPM)
+range(final_data$DBPM)
+range(final_data$BPM)
+range(final_data$VORP)
+range(final_data$FG)
+range(final_data$FGA)
+range(final_data$FG.)
+range(final_data$X3P)
+range(final_data$X3PA)
+range(final_data$X2P)
+range(final_data$X2PA)
+range(final_data$X2P.)
+range(final_data$eFG.)
+range(final_data$FT)
+range(final_data$FTA)
+range(final_data$FT.)
+range(final_data$ORB)
+range(final_data$DRB)
+range(final_data$TRB)
+range(final_data$AST)
+range(final_data$STL)
+range(final_data$BLK)
+range(final_data$TOV)
+range(final_data$PF)
+range(final_data$PTS)
+
+
+# Observe data with statistically significant predictors (lm19) using Box Plot
 d <- melt(final_data, id="season17_18")
 ggplot(d,aes(x=variable,y=value,color=variable)) +
   geom_boxplot() +
   theme(axis.text.x = element_text(size=10, angle=45))
-dt <- final_data[,c(1,2,3,8,19,27)]
+dt <- final_data[,c(1,2,3,5,9,19,36)]
 dt1 <- final_data[,c(1,2,3)]
-dt2 <- final_data[,c(1,8,19)]
-dt3 <- final_data[,c(1,27)]
+dt2 <- final_data[,c(1,5)]
+dt3 <- final_data[,c(1,36)]
+dt4 <- final_data[,c(1,9,19)]
 e <- melt(dt,id="season17_18")
 e1 <- melt(dt1,id="season17_18")
 e2 <- melt(dt2,id="season17_18")
 e3 <- melt(dt3,id="season17_18")
+e4 <- melt(dt4,id="season17_18")
 ggplot(e,aes(x=variable,y=value)) + geom_boxplot()
 ggplot(e1,aes(x=variable,y=value)) + geom_boxplot()
 ggplot(e2,aes(x=variable,y=value)) + geom_boxplot()
 ggplot(e3,aes(x=variable,y=value)) + geom_boxplot()
+ggplot(e4,aes(x=variable,y=value)) + geom_boxplot()
 
 # Fit the regression, summarize and check assumptions
 lm1 <- lm(season17_18 ~ ., data = final_data); summary(lm1);performance::check_model(lm1)
@@ -64,9 +114,31 @@ lm2 <- lm((season17_18)^0.25~Age+G+GS+MP+PER+TS.+sqrt(X3PAr)+log(FTr+4)+log(ORB.
           , data=final_data); summary(lm2); performance::check_model(lm2)
 # See "NBASalary Transformations" R file on Github for predictors transformation visual diagnostics 
 
+# Drop percentages and FTr due to redundancy and impossible ranges
+lm2a <- update(lm2, ~. - log(AST.+1) -STL. - sqrt(BLK.) - log(TOV.+ 20) - FT. - log(X2P.+ 20) - log(ORB.+1) -log(TRB.+1) - DRB. -log(FTr+4)); summary(lm2a); performance::check_model(lm2a)
+lm3a <- update(lm2a, ~. - log(eFG. + 20) - log(OWS + 20) - sqrt(FG + 20) - sqrt(X2P + 20) - sqrt(X2PA + 20) - log(FT + 20) - 
+                sqrt(TRB + 20) - sqrt(X3PA + 20) - sqrt(FGA)); summary(lm3a); performance::check_model(lm3a)
+anova(lm2a,lm2)
+anova(lm3a,lm2)
+lm22 <- step(lm3a, k = log(n))
+summary(lm22); performance::check_model(lm22)
+plot((final_data$season17_18)^0.25, resid(lm22), data=final_data)
+
+# Drop FTr due to impossible range
+lm2b <- update(lm2, ~. -log(FTr+4));summary(lm2b);performance::check_model(lm2b)
+lm3b <- update(lm2b, ~. - log(eFG. + 20) - log(OWS + 20) - sqrt(FG + 20) - sqrt(X2P + 20) - sqrt(X2PA + 20) - log(FT + 20) - 
+                 sqrt(TRB + 20) - sqrt(X3PA + 20) - sqrt(FGA)); summary(lm3b); performance::check_model(lm3b)
+anova(lm2b,lm2)
+anova(lm3b,lm2)
+lm22b <- step(lm3b, k = log(n))
+summary(lm22b); performance::check_model(lm22b)
+plot((final_data$season17_18)^0.25, resid(lm22b), data=final_data)
+
 # Is there a relationship between the response and at least one predictor in our regression model?
 null <- lm((season17_18)^0.25~1, data=final_data)
 anova(null,lm2)
+anova(null,lm2a)
+anova(null,lm2b)
 # Since the p-value is less than 0.05, we reject the null and conclude there is at least one predictor that is useful at predicting salary
 
 # Address multicollinearity through correlation matrix
@@ -223,6 +295,8 @@ anova(lm21a,lm2)# keep lm21a
 anova(lm21b,lm2) # keep lm21b
 anova(lm21c,lm2) # keep lm21c
 anova(lm21d,lm2) # use lm2
+anova(lm22,lm2) # keep lm22
+anova(lm22b,lm2) # keep lm22b
 
 
 # Assign models to a name
@@ -250,6 +324,8 @@ s21a <- summary(lm21a)
 s21b <- summary(lm21b)
 s21c <- summary(lm21c)
 s21d <- summary(lm21d)
+s22 <- summary(lm22)
+s22b <- summary(lm22b)
 
 # Use assigned models to pull adjusted R-squared values
 s2$adj.r.squared
@@ -276,6 +352,8 @@ s21a$adj.r.squared
 s21b$adj.r.squared
 s21c$adj.r.squared
 s21d$adj.r.squared
+s22$adj.r.squared
+s22b$adj.r.squared
 
 # Using lm19 to predict Curry's and Lillard's 2017-18 salary
 pred_curry0 <- predict(lm19,newdata = data.frame(Age=28,G=79.000000,MP=2638.0000, FTr=0.25100000,DWS=3.90000000,FTA=362.000000), interval="prediction")
@@ -316,6 +394,17 @@ pairs((season17_18^0.25)~Age+G+sqrt(DWS+20)+sqrt(FGA), data=final_data)
 round(cor(final_data[,c(1,2,3,19,27)]),4)
 # no high collinearity but lower adjusted r squared than full model
 
+# Scatterplot matrix of lm22
+pairs((season17_18)^0.25 ~ Age + G + sqrt(DRB +20) + sqrt(PTS + 20) , data=final_data)
+round(cor(final_data[,c(1,2,3,39,46)]),4)
+# no high collinearity but lower adjusted r squared than full model
+
+# Scatterplot matrix of lm22b
+pairs((season17_18)^0.25 ~ Age + G + sqrt(DWS + 20) + sqrt(PTS + 20) , data=final_data)
+round(cor(final_data[,c(1,2,3,19,46)]),4)
+# no high collinearity but lower adjusted r squared than full model
+
+
 # Cross validation
 set.seed(111)
 n <- nrow(final_data);n
@@ -323,7 +412,7 @@ z <- floor(0.7*n)
 train <- sample(1:n, z)
 test_data <- final_data[-train,]
 
-# Train models lm21c (lm_train), full model (lm_train1), lm19 (lm_train2), and lm21 (lm_train3)
+# Train models lm21c (lm_train), full model (lm_train1), lm19 (lm_train2), lm21 (lm_train3), lm22b (lm_train4)
 lm_train <- lm((season17_18)^0.25~Age+G+sqrt(DWS+20)+sqrt(FGA), data=final_data, subset=train)
 lm_train1 <- lm((season17_18)^0.25~Age+G+GS+MP+PER+TS.+sqrt(X3PAr)+log(FTr+4)+log(ORB.+1)+DRB.+log(TRB.+1)+log(AST.+1)+STL.+sqrt(BLK.)
                 + log(TOV.+ 20) + USG. + log(OWS+ 20) + sqrt(DWS+ 20) + sqrt(WS+ 20) + WS.48 + sqrt(OBPM + 20) + sqrt(DBPM + 20) + BPM + log(VORP+ 20) + sqrt(FG+ 20) + FG.+ sqrt(FGA) + sqrt(X3PA+ 20) + sqrt(X2P+ 20) + 
@@ -331,10 +420,13 @@ lm_train1 <- lm((season17_18)^0.25~Age+G+GS+MP+PER+TS.+sqrt(X3PAr)+log(FTr+4)+lo
                 , data=final_data, subset=train)
 lm_train2 <- lm((season17_18)^0.25 ~ Age + G + MP + log(FTr + 4) + sqrt(DWS +20) + log(FTA + 6), data=final_data, subset=train)
 lm_train3 <- lm((season17_18)^0.25 ~ Age + G + sqrt(X3PAr) + sqrt(DWS +20) + FG. + sqrt(FGA) + log(eFG. + 20), data = final_data, subset=train)
+lm_train4 <- lm((season17_18)^0.25 ~ Age + G + sqrt(DWS + 20) + sqrt(PTS + 20) , data=final_data, subset=train)
+
 summary(lm_train)
 summary(lm_train1)
 summary(lm_train2)
 summary(lm_train3)
+summary(lm_train4)
 
 predictions <- lm_train %>% predict(test_data)
 data.frame(R2 = R2(predictions, test_data$season17_18),
@@ -355,7 +447,12 @@ predictions3 <- lm_train3 %>% predict(test_data)
 data.frame(R2 = R2(predictions3, test_data$season17_18),
            RMSE = RMSE(predictions3, test_data$season17_18),
            MAE = MAE(predictions3, test_data$season17_18))
-# Same RMSE for all models except lm21 (lm_train3) is one less
+predictions4 <- lm_train4 %>% predict(test_data)
+data.frame(R2 = R2(predictions4, test_data$season17_18),
+           RMSE = RMSE(predictions4, test_data$season17_18),
+           MAE = MAE(predictions4, test_data$season17_18))
+
+# Same RMSE for all models except lm21 (lm_train3) and lm22b are one less
 
 
 # Manually calculate RMSE
@@ -363,7 +460,8 @@ sqrt((sum((test_data$season17_18 - predictions)^2))/(n-z))
 sqrt((sum((test_data$season17_18 - predictions1)^2))/(n-z))
 sqrt((sum((test_data$season17_18 - predictions2)^2))/(n-z))
 sqrt((sum((test_data$season17_18 - predictions3)^2))/(n-z))
-# Same RMSE for all models except lm21 (lm_train3) is one less
+sqrt((sum((test_data$season17_18 - predictions4)^2))/(n-z))
+# Same RMSE for all models except lm21 (lm_train3) and lm22b are one less
 
 # Run predictions to ensure different predictions from different models
 pred_dame1 <- predict(lm21b,newdata = data.frame(Age=26,G=75.000000,X3PAr = 0.3880000,DWS = 1.50000000,FG. = 0.4440000 , FGA=1488.000000), interval="prediction")
