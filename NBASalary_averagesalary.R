@@ -1,10 +1,9 @@
+################################################ DATA CLEANING ##################################################################
 # Load libraries
 library(tidyverse);library(car);library(emmeans);library(MASS);library(reshape);library(reshape2);library(faraway);library(caret)
-
 # Read csv files
 salary_data <- read.csv("NBA_season1718_salary.csv"); stats_data <- read.csv("Seasons_Stats.csv")
 dim(salary_data);dim(stats_data)
-
 # Full join both data sets
 data0 <- salary_data %>% 
   full_join(.,stats_data, by=unique("Player")) %>% 
@@ -20,17 +19,16 @@ data0 <- salary_data %>%
             X2P = mean(X2P) ,X2PA = mean(X2PA) ,X2P. = mean(X2P.) ,eFG. = mean(eFG.),FT = mean(FT),
             FTA = mean(FTA),FT. = mean(FT.),ORB = mean(ORB),DRB = mean(DRB),TRB = mean(TRB),
             AST = mean(AST),STL = mean(STL),BLK = mean(BLK),TOV = mean(TOV),PF = mean(PF),PTS = mean(PTS)); dim(data0)
-
 # Omit Player column and set data frame
 fdata <- data0 %>% 
   dplyr::select(-Player) %>% 
   na.omit(); dim(fdata); 403/486
 final_data <- data.frame(fdata)
 
+################################################ DATA EXPLORATION ##################################################################
 # Explore response variable
 mean(final_data$season17_18)
 range(final_data$season17_18)
-
 # Explore explanatory variables
 range(final_data$G)
 range(final_data$GS)
@@ -77,32 +75,9 @@ range(final_data$TOV)
 range(final_data$PF)
 range(final_data$PTS)
 
-
-# Observe data with statistically significant predictors (lm19) using Box Plot
-d <- melt(final_data, id="season17_18")
-ggplot(d,aes(x=variable,y=value,color=variable)) +
-  geom_boxplot() +
-  theme(axis.text.x = element_text(size=10, angle=45))
-dt <- final_data[,c(1,2,3,5,9,19,36)]
-dt1 <- final_data[,c(1,2,3)]
-dt2 <- final_data[,c(1,5)]
-dt3 <- final_data[,c(1,36)]
-dt4 <- final_data[,c(1,9,19)]
-e <- melt(dt,id="season17_18")
-e1 <- melt(dt1,id="season17_18")
-e2 <- melt(dt2,id="season17_18")
-e3 <- melt(dt3,id="season17_18")
-e4 <- melt(dt4,id="season17_18")
-ggplot(e,aes(x=variable,y=value)) + geom_boxplot()
-ggplot(e1,aes(x=variable,y=value)) + geom_boxplot()
-ggplot(e2,aes(x=variable,y=value)) + geom_boxplot()
-ggplot(e3,aes(x=variable,y=value)) + geom_boxplot()
-ggplot(e4,aes(x=variable,y=value)) + geom_boxplot()
-
+################################################ MODELING ##################################################################
 # Fit the regression, summarize and check assumptions
 lm1 <- lm(season17_18 ~ ., data = final_data); summary(lm1);performance::check_model(lm1)
-
-
 
 # Fit regression with transformed predictors (Full model)
 lm2 <- lm((season17_18)^0.33~Age+G+GS+MP+PER+TS.+sqrt(X3PAr)+log(FTr+4)+log(ORB.+1)+DRB.+log(TRB.+1)+log(AST.+1)+STL.+sqrt(BLK.)
@@ -116,27 +91,35 @@ ptf<- powerTransform(season17_18~.,data = final_data)
 summary(ptf)
 par(mfrow=c(2,3));qqPlot(final_data$season17_18);qqPlot((final_data$season17_18)^0.33);hist(final_data$season17_18);hist((final_data$season17_18)^0.33);plot(final_data$season17_18,resid(lm2),data=final_data);plot((final_data$season17_18)^0.33,resid(lm2),data=final_data)
 
+# Is there a relationship between the response and at least one predictor in our regression model?
+null <- lm((season17_18)^0.33~1, data=final_data)
+anova(null,lm2)
+# Since the p-value is less than 0.05, we reject the null and conclude there is at least one predictor that is useful at predicting salary
 
+############################### BACKWARDS ELIMINATION (VARIABLE SELECTION) ############################################################
 # Drop percentages and FTr due to redundancy and impossible ranges
 lm2a <- update(lm2, ~. - log(AST.+1) -STL. - sqrt(BLK.) - log(TOV.+ 20) - FT. - log(X2P.+ 20) - log(ORB.+1) -log(TRB.+1) - DRB. -log(FTr+4)); summary(lm2a); performance::check_model(lm2a)
 lm3a <- update(lm2a, ~. - log(eFG. + 20) - log(OWS + 20) - sqrt(FG + 20) - sqrt(X2P + 20) - sqrt(X2PA + 20) - log(FT + 20) - 
                 sqrt(TRB + 20) - sqrt(X3PA + 20) - sqrt(FGA)); summary(lm3a); performance::check_model(lm3a)
-anova(lm2a,lm2)
-anova(lm3a,lm2)
+# Drop FTr due to impossible range
+lm2b <- update(lm2, ~. -log(FTr+4));summary(lm2b);performance::check_model(lm2b)
+lm3b <- update(lm2b, ~. - log(eFG. + 20) - log(OWS + 20) - sqrt(FG + 20) - sqrt(X2P + 20) - sqrt(X2PA + 20) - log(FT + 20) - 
+                 sqrt(TRB + 20) - sqrt(X3PA + 20) - sqrt(FGA)); summary(lm3b); performance::check_model(lm3b)
+# Create a linear model with first set of rejects (rho>0.9) with high collinearity & lower correlation with the response variable
+lm3 <- update(lm2, ~. - log(eFG. + 20) - log(TRB. + 1) - log(OWS + 20) - sqrt(FG + 20) - sqrt(X2P + 20) - sqrt(X2PA + 20) - log(FT + 20) - 
+                sqrt(TRB + 20) - sqrt(X3PA + 20) - sqrt(FGA)); summary(lm3); performance::check_model(lm3)
+
+################################ BACKWARDS STEPWISE SELECTION (VARIABLE SELECTION) ####################################################
 n = nrow(final_data)
+lm19 <- step(lm3, k = log(n))
+summary(lm19); performance::check_model(lm19)
+plot((final_data$season17_18)^0.25, resid(lm19), data=final_data)
 lm22 <- step(lm2a, k = log(n))
 summary(lm22); performance::check_model(lm22)
 plot((final_data$season17_18)^0.33, resid(lm22), data=final_data)
 lm22a <- step(lm3a, k = log(n))
 summary(lm22a); performance::check_model(lm22a)
 plot((final_data$season17_18)^0.33, resid(lm22a), data=final_data)
-
-# Drop FTr due to impossible range
-lm2b <- update(lm2, ~. -log(FTr+4));summary(lm2b);performance::check_model(lm2b)
-lm3b <- update(lm2b, ~. - log(eFG. + 20) - log(OWS + 20) - sqrt(FG + 20) - sqrt(X2P + 20) - sqrt(X2PA + 20) - log(FT + 20) - 
-                 sqrt(TRB + 20) - sqrt(X3PA + 20) - sqrt(FGA)); summary(lm3b); performance::check_model(lm3b)
-anova(lm2b,lm2)
-anova(lm3b,lm2)
 lm22b <- step(lm3b, k = log(n))
 summary(lm22b); performance::check_model(lm22b)
 plot((final_data$season17_18)^0.33, resid(lm22b), data=final_data)
@@ -149,110 +132,6 @@ round(cor(final_data[,c(1,2,3,8,18,19,27)]),4)
 lm22f <- update(lm22e,~. -sqrt(X3PAr)); summary(lm22f);performance::check_model(lm22f)
 pairs((season17_18)^0.33 ~ Age + G + log(OWS + 20) + sqrt(DWS + 20) + sqrt(FGA), data = final_data)
 round(cor(final_data[,c(1,2,3,18,19,27)]),4)
-
-# Is there a relationship between the response and at least one predictor in our regression model?
-null <- lm((season17_18)^0.33~1, data=final_data)
-anova(null,lm2)
-anova(null,lm2a)
-anova(null,lm2b)
-# Since the p-value is less than 0.05, we reject the null and conclude there is at least one predictor that is useful at predicting salary
-
-# Address multicollinearity through correlation matrix
-corr_df <- round(cor(final_data[,1:46]),2)
-
-# Scan the upper right triangle of the correlation matrix. Print indeces that have correlation values greater than .9
-corr_vals <- c()
-for(i in 1:ncol(corr_df)){
-  for(j in i:ncol(corr_df)){
-    if(corr_df[i,j] > .9 & corr_df[i,j] < 1){
-      corr_vals <- append(corr_vals, c(i,j))
-    }
-  }
-}; length(corr_vals);corr_vals
-
-# Compare variables with high collinearity with the response variable###
-# Create a matrix to see the index pairs with high collinearity
-colnames(corr_df)
-corr_pairs <- matrix(corr_vals, ncol = 2, byrow = TRUE); corr_pairs
-
-# Create a linear model with first set of rejects (rho>0.9) with high collinearity & lower correlation with the response variable
-lm3 <- update(lm2, ~. - log(eFG. + 20) - log(TRB. + 1) - log(OWS + 20) - sqrt(FG + 20) - sqrt(X2P + 20) - sqrt(X2PA + 20) - log(FT + 20) - 
-                sqrt(TRB + 20) - sqrt(X3PA + 20) - sqrt(FGA)); summary(lm3); performance::check_model(lm3)
-# Compare model to full model
-anova(lm3,lm2)
-# High p-value indicates we can drop these predictors/rejects
-
-# Scan the upper right triangle of the correlation matrix. Print indeces that have correlation values greater than .83 and less than .9
-corr_vals2 <- c()
-for(i in 1:ncol(corr_df)){
-  for(j in i:ncol(corr_df)){
-    if(corr_df[i,j] > .83 & corr_df[i,j] <= .9){
-      corr_vals2 <- append(corr_vals2, c(i,j))
-    }
-  }
-}; length(corr_vals2); corr_vals2
-
-corr_pairs2 <- matrix(corr_vals2, ncol = 2, byrow = TRUE)
-corr_pairs2
-
-# Create a linear model with our second set of rejects (rho>0.83) with high collinearity & lower correlation with the response variable
-lm4 <- update(lm3, ~. - G - MP - WS.48 - log(ORB. + 1) - sqrt(TRB + 20) - log(ORB + 20) - log(VORP + 20) - log(FTA + 6) - 
-                sqrt(OBPM + 20) - log(FT + 20) - sqrt(TOV + 20) - log(X2P. + 20) - FG. - sqrt(X2P + 20) - sqrt(X2PA + 20) -
-                log(AST + 20)); summary(lm4); performance::check_model(lm4)
-# Compare model to full model
-anova(lm4,lm2)
-# Low p-value indicates we cannot drop these predictors/rejects since at least one is useful at predicting salary
-
-
-# ########### Next we will make a new correlation matrix that only includes the variables in our most recent model
-# # lm4
-# 
-# corr_df2 <- data.frame(corr_df)[,c(1,2,4,6,7,8,9,11,13,14,15,16,17,19,20,23,24,37,39,42,43,45,46)]
-# view(corr_df2)
-# 
-# 
-# corr_vals3 <- c()
-# for(i in 1:ncol(corr_df2)){
-#   for(j in i:ncol(corr_df2)){
-#     if(abs(corr_df2[i,j]) >= .7 & abs(corr_df2[i,j]) < 1){
-#       corr_vals3 <- append(corr_vals3, c(i,j))
-#     }
-#   }
-# }; length(corr_vals3); corr_vals3
-# 
-# corr_pairs3 <- matrix(corr_vals3, ncol = 2, byrow = TRUE)
-# corr_pairs3
-# 
-lm5 <- update(lm4, ~ . - PER - TS. - sqrt(DRB+20) - sqrt(WS + 20)); summary(lm5)
-# 
-# n = nrow(final_data)
-lm6 <- step(lm5, k = log(n))
-# summary(lm6)
-# 
-# ### Looks good!!! will now do stepwise selection, we will remove variables one-by-one based off of high p-values
-# 
-lm7 <- update(lm5,  ~ . - FT.); summary(lm7)
-lm8 <- update(lm7,  ~ . - sqrt(DBPM + 20)); summary(lm8)
-lm9 <- update(lm8,  ~ . - STL.); summary(lm9)
-lm10 <- update(lm9,  ~ . - sqrt(X3PAr)); summary(lm10)
-lm11 <- update(lm10,  ~ . - log(FTr + 4)); summary(lm11)
-lm12 <- update(lm11,  ~ . - USG.); summary(lm12)
-lm13 <- update(lm12,  ~ . - log(BLK + 20)); summary(lm13)
-lm14 <- update(lm13,  ~ . - sqrt(STL +20)); summary(lm14)
-lm15 <- update(lm14,  ~ . - log(AST. + 1)); summary(lm15)
-lm16 <- update(lm15,  ~ . - BPM); summary(lm16)
-lm17 <- update(lm16,  ~ . - log(TOV.+20)); summary(lm17)
-lm18 <- update(lm17,  ~ . - sqrt(BLK.)); summary(lm18)
-
-# summary(lm6);summary(lm18)
-# performance::check_model(lm6)
-# performance::check_model(lm18)
-
-# Perform backwards stepwise selection on lm3
-lm19 <- step(lm3, k = log(n))
-summary(lm19); performance::check_model(lm19)
-plot((final_data$season17_18)^0.25, resid(lm19), data=final_data)
-
 # Perform backwards elimination on lm19
 lm19a <- update(lm19,  ~ . - sqrt(X3PAr)); summary(lm19a);performance::check_model(lm19a) # insignificant predictors
 lm19b <- update(lm19a,  ~ . - PER); summary(lm19b);performance::check_model(lm19b) # collinearity issue
@@ -282,6 +161,7 @@ summary(lm21a); performance::check_model(lm21a) # multicollinearity issues
 summary(lm21b); performance::check_model(lm21b) # multicollinearity issues
 summary(lm21c); performance::check_model(lm21c) # multicollinearity issues
 
+################################################ MODEL SELECTION ##################################################################
 # Compare all models against full model
 anova(lm2a,lm2) # keep lm2a
 anova(lm2b,lm2) # keep lm2b
@@ -381,7 +261,7 @@ s22b$adj.r.squared # better than full model
 s22e$adj.r.squared # better than full model
 s22f$adj.r.squared
 
-# Cross validation
+################################################ CROSS VALIDATION ##################################################################
 set.seed(111)
 n <- nrow(final_data);n
 z <- floor(0.7*n)
