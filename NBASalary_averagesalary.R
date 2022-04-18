@@ -73,6 +73,7 @@ range(final_data$BLK)
 range(final_data$TOV)
 range(final_data$PF)
 range(final_data$PTS)
+round(cor(final_data[,c(1:46)]),4)
 ##################################### OVERALL F-TEST AND MODELING ##################################################################
 # Fit the regression, summarize and check assumptions
 lm1 <- lm(season17_18 ~ ., data = final_data); summary(lm1);performance::check_model(lm1)
@@ -102,25 +103,32 @@ lm2b <- update(lm2, ~. -log(FTr+4));summary(lm2b);performance::check_model(lm2b)
 # Remove predictors with high correlation values
 lm3b <- update(lm2b, ~. - log(eFG. + 20) - log(OWS + 20) - sqrt(FG + 20) - sqrt(X2P + 20) - sqrt(X2PA + 20) - log(FT + 20) - 
                  sqrt(TRB + 20) - sqrt(X3PA + 20) - sqrt(FGA)); summary(lm3b); performance::check_model(lm3b)
+# Drop FTr due to impossible range, G due to similarity with GS, and FT. due to not meeting assumptions after transformation
+lm2c <- update(lm2, ~. - log(FTr+4) - G - FT.); summary(lm2c); performance::check_model(lm2c)
+# Remove predictors with high correlation values
+lm3c <- update(lm2c, ~. - log(eFG. + 20) - log(OWS + 20) - sqrt(FG + 20) - sqrt(X2P + 20) - sqrt(X2PA + 20) - 
+                 sqrt(TRB + 20) - sqrt(X3PA + 20) - sqrt(FGA)); summary(lm3c); performance::check_model(lm3c)
 ################################ BACKWARDS STEPWISE SELECTION & ELIMINATION (VARIABLE SELECTION) ######################################
 n = nrow(final_data)
 lm19 <- step(lm3, k = log(n));summary(lm19); performance::check_model(lm19)
-  lm19a <- update(lm19,  ~ . - sqrt(X3PAr)); summary(lm19a);performance::check_model(lm19a) # insignificant predictors
-  lm19b <- update(lm19a,  ~ . - PER); summary(lm19b);performance::check_model(lm19b) # collinearity issue
+  lm19a <- update(lm19,  ~ . - sqrt(X3PAr)); summary(lm19a);performance::check_model(lm19a)
+  lm19b <- update(lm19a,  ~ . - PER); summary(lm19b);performance::check_model(lm19b)
   lm19c <- update(lm19b,  ~ . - log(VORP + 20)); summary(lm19c);performance::check_model(lm19c)
   lm19d <- update(lm19c,  ~ . - BPM); summary(lm19d);performance::check_model(lm19d)
-lm20 <- step(lm4, k = log(n));summary(lm20); performance::check_model(lm20)
-lm21 <- step(lm2, k = log(n));summary(lm21); performance::check_model(lm21) # multicollinearity issues
-  lm21a <- update(lm21,~.-GS);summary(lm21a); performance::check_model(lm21a) # multicollinearity issues
-  lm21b <- update(lm21a,~.-log(OWS+20));summary(lm21b); performance::check_model(lm21b) # multicollinearity issues
-  lm21c <- update(lm21b,~.-sqrt(X2P+20));summary(lm21c); performance::check_model(lm21c) # multicollinearity issues
+lm21 <- step(lm2, k = log(n));summary(lm21); performance::check_model(lm21)
+  lm21a <- update(lm21,~.-GS);summary(lm21a); performance::check_model(lm21a)
+  lm21b <- update(lm21a,~.-log(OWS+20));summary(lm21b); performance::check_model(lm21b)
+  lm21c <- update(lm21b,~.-sqrt(X2P+20));summary(lm21c); performance::check_model(lm21c) 
 lm22 <- step(lm2a, k = log(n));summary(lm22); performance::check_model(lm22)
   lm22a <- step(lm3a, k = log(n));summary(lm22a); performance::check_model(lm22a)
   lm22b <- step(lm3b, k = log(n));summary(lm22b); performance::check_model(lm22b)
   lm22c <- step(lm2b, k = log(n));summary(lm22c); performance::check_model(lm22c)
   lm22d <- update(lm22c,~. -GS); summary(lm22d);performance::check_model(lm22d)
-  lm22e <- update(lm22d,~. -sqrt(X2P+20)); summary(lm22e);performance::check_model(lm22e) #### best model??????????????????
+  lm22e <- update(lm22d,~. -sqrt(X2P+20)); summary(lm22e);performance::check_model(lm22e)
   lm22f <- update(lm22e,~. -sqrt(X3PAr)); summary(lm22f);performance::check_model(lm22f)
+  lm22g <- step(lm2a, k = log(n));summary(lm22g);performance::check_model(lm22g)
+  lm22h <- update(lm22a,~.-G);summary(lm22h);performance::check_model(lm22h)
+lm23 <- step(lm2c, k =log(n));summary(lm23);performance::check_model(lm23)
 # View scatterplot matrices
 pairs((season17_18)^0.33 ~ Age + G + sqrt(X3PAr) + log(OWS + 20) + sqrt(DWS + 20) + sqrt(FGA), data = final_data)
 round(cor(final_data[,c(1,2,3,8,18,19,27)]),4)
@@ -130,66 +138,77 @@ round(cor(final_data[,c(1,2,3,18,19,27)]),4)
 # Compare all models against full model
 anova(lm2a,lm2) # keep lm2a
 anova(lm2b,lm2) # keep lm2b
+anova(lm2c,lm2) # use lm2
 anova(lm3,lm2) # keep lm3
 anova(lm3a,lm2) # keep lm3a
 anova(lm3b,lm2) # keep lm3b
-anova(lm19,lm2) # keep lm19 ----- high p-value
-anova(lm19a,lm2) # use lm2
-anova(lm19b,lm2) # use lm2
-anova(lm19c,lm2) # use lm2
-anova(lm20,lm2) # use lm2
-anova(lm21,lm2) # keep lm21 ----- high p-value
+anova(lm3c,lm2) # use lm2
+anova(lm19,lm2) # keep lm19
+anova(lm19a,lm2) # keep lm19a
+anova(lm19b,lm2) # keep lm19b
+anova(lm19c,lm2) # keep lm19c
+anova(lm19d,lm2) # keep lm19d
+anova(lm21,lm2) # keep lm21
 anova(lm21a,lm2)# keep lm21a
 anova(lm21b,lm2) # keep lm21b
 anova(lm21c,lm2) # use lm2
-anova(lm21d,lm2) # use lm2
 anova(lm22,lm2) # keep lm22
 anova(lm22a,lm2) # keep lm22a
 anova(lm22b,lm2) # keep lm22b
 anova(lm22e,lm2) # keep lm22e
-anova(lm22f,lm2) # undecided
+anova(lm22f,lm2) # use lm2
+anova(lm22g,lm2) # keep lm22g
+anova(lm22h,lm2) # use lm2
+anova(lm23,lm2) # use lm2
 # Assign models to a name
-s2 <- summary(lm2)
-s3 <- summary(lm3)
-s19 <- summary(lm19)
-s20 <- summary(lm20)
-s21 <- summary(lm21)
-s21a <- summary(lm21a)
-s21b <- summary(lm21b)
-s21c <- summary(lm21c)
-s21d <- summary(lm21d)
-s22 <- summary(lm22)
-s22a <- summary(lm22a)
-s22b <- summary(lm22b)
-s22e <- summary(lm22e)
-s22f <- summary(lm22f)
-# Use assigned models to pull adjusted R-squared values
-s2$adj.r.squared
-s3$adj.r.squared
-s19$adj.r.squared # better than full model
-s20$adj.r.squared
-s21$adj.r.squared # better than full model
-s21a$adj.r.squared
-s21b$adj.r.squared
-s21c$adj.r.squared
-s21d$adj.r.squared
-s22$adj.r.squared # better than full model
-s22a$adj.r.squared # better than full model
-s22b$adj.r.squared # better than full model
-s22e$adj.r.squared # better than full model
-s22f$adj.r.squared
+s2 <- summary(lm2)$adj.r.squared
+s2a <- summary(lm2a)$adj.r.squared
+s2b <- summary(lm2b)$adj.r.squared
+s2c <- summary(lm2c)$adj.r.squared
+s3 <- summary(lm3)$adj.r.squared
+s3a <- summary(lm3a)$adj.r.squared
+s3b <- summary(lm3b)$adj.r.squared
+s3c <- summary(lm3c)$adj.r.squared
+s19 <- summary(lm19)$adj.r.squared
+s19a <- summary(lm19a)$adj.r.squared
+s19b <- summary(lm19b)$adj.r.squared
+s19c <- summary(lm19c)$adj.r.squared
+s19d <- summary(lm19d)$adj.r.squared
+s21 <- summary(lm21)$adj.r.squared
+s21a <- summary(lm21a)$adj.r.squared
+s21b <- summary(lm21b)$adj.r.squared
+s21c <- summary(lm21c)$adj.r.squared
+s22 <- summary(lm22)$adj.r.squared
+s22a <- summary(lm22a)$adj.r.squared
+s22b <- summary(lm22b)$adj.r.squared
+s22c <- summary(lm22c)$adj.r.squared
+s22d <- summary(lm22d)$adj.r.squared
+s22e <- summary(lm22e)$adj.r.squared
+s22f <- summary(lm22f)$adj.r.squared
+s22g <- summary(lm22g)$adj.r.squared
+s22h <- summary(lm22h)$adj.r.squared
+s23 <- summary(lm23)$adj.r.squared
+# View adjusted R squared
+s2;s2a;s2b;s2c;s3;s3a;s3b;s3c;s19;s19a;s19b;s19c;s19d;s21;s21a;s21b;s21c;s22;s22a;s22b;s22c;s22d;s22e;s22f;s22g;s22h;s23
+BIC(lm2,lm2a,lm2b,lm2c,lm3,lm3a,lm3b,lm3c,lm19,lm19a,lm19b,lm19c,lm19d,lm21,lm21a,lm21b,lm21c,lm22,lm22a,lm22b,lm22c,lm22d,lm22e,lm22f,lm22g,lm22h,lm23)
+#lm21,lm22,lm22c,lm22g all have high collinearity
+#lm22d and lm21a have high collinearity
+#lm22a has the next best BIC 
+round(cor(final_data[,c(1,2,3,4,19,46)]),4)
 ################################################ CROSS VALIDATION ##################################################################
 set.seed(111)
 n <- nrow(final_data);n
 z <- floor(0.7*n)
 train <- sample(1:n, z)
 test_data <- final_data[-train,]
-# Train models full model (lm_train1) and lm22e
-lm_train1 <- lm((season17_18)^0.33~Age+G+GS+MP+PER+TS.+sqrt(X3PAr)+log(FTr+4)+log(ORB.+1)+DRB.+log(TRB.+1)+log(AST.+1)+STL.+sqrt(BLK.)
-                + log(TOV.+ 20) + USG. + log(OWS+ 20) + sqrt(DWS+ 20) + sqrt(WS+ 20) + WS.48 + sqrt(OBPM + 20) + sqrt(DBPM + 20) + BPM + log(VORP+ 20) + sqrt(FG+ 20) + FG.+ sqrt(FGA) + sqrt(X3PA+ 20) + sqrt(X2P+ 20) + 
-                  sqrt(X2PA+ 20) + log(X2P.+ 20) + log(eFG.+ 20) + log(FT+ 20) + log(FTA +6) + FT. + log(ORB+ 20) + sqrt(DRB+ 20) + sqrt(TRB+ 20) + log(AST+ 20) + sqrt(STL+ 20) + log(BLK+ 20) + sqrt(TOV+ 20) + PF + sqrt(PTS+ 20)
-                , data=final_data, subset=train);summary(lm_train1)
-lm_train2 <- lm((season17_18)^0.33 ~ Age + G + sqrt(X3PAr) + log(OWS + 20) + sqrt(DWS + 20) + sqrt(FGA), data=final_data, subset=train);summary(lm_train2)
+# Train models full model lm2 (lm_train1) and lm22a (lm_train2)
+lm_train1 <- lm(season17_18^0.33 ~ Age + G + GS + MP + PER + TS. + 
+                  sqrt(X3PAr) + log(FTr + 4) + log(ORB. + 1) + DRB. + log(TRB. + 1) + log(AST. + 1) + STL. + sqrt(BLK.) + log(TOV. + 20) + 
+                  USG. + log(OWS + 20) + sqrt(DWS + 20) + sqrt(WS + 20) + WS.48 + sqrt(OBPM + 20) + sqrt(DBPM + 20) + BPM + log(VORP + 20) + 
+                  sqrt(FG + 20) + FG. + sqrt(FGA) + sqrt(X3PA + 20) + sqrt(X2P + 20) + sqrt(X2PA + 20) + log(X2P. + 20) + log(eFG. + 20) + 
+                  log(FT + 20) + log(FTA + 6) + FT. + log(ORB + 20) + sqrt(DRB + 20) + sqrt(TRB + 20) + log(AST + 20) + sqrt(STL + 20) +
+                  log(BLK + 20) + sqrt(TOV + 20) + PF + sqrt(PTS + 20), data = final_data, subset=train); summary(lm_train1)
+lm_train2 <- lm((season17_18)^0.33 ~ Age + G + GS + sqrt(DWS + 20) + sqrt(PTS + 20), data = final_data, subset=train);summary(lm_train2)
 # Calculate R2, RMSE, and MAE
 predictions1 <- lm_train1 %>% predict(test_data)
 data.frame(R2 = R2(predictions1, test_data$season17_18),
@@ -200,9 +219,9 @@ data.frame(R2 = R2(predictions2, test_data$season17_18),
            RMSE = RMSE(predictions2, test_data$season17_18),
            MAE = MAE(predictions2, test_data$season17_18))
 ##################################### VERIFY AND CALCULATE PREDICTION INTERVAL ##################################################################
-pred_dame <- predict(lm22e,newdata=data.frame(Age=26, G=75.000000,X3PAr=0.3880000,OWS=8.80000000,DWS=1.50000000,FGA=1488.000000),interval="prediction")
+pred_dame <- predict(lm22a,newdata=data.frame(Age=26, G=75.000000,GS=75.000000,DWS=1.50000000,PTS=2024.000000),interval="prediction")
 pred_dame^3
 # RESULTS:
-#       fit     lwr      upr
-# 16,020,342 5,028,574 36,879,213
+# fit       lwr        upr
+# 14,772,813 4,543,778 34,362,849
 # Actual Salary = 26,153,057.0
