@@ -211,13 +211,13 @@ lm_train1 <- lm(season17_18^0.33 ~ Age + G + GS + MP + PER + TS. +
 lm_train2 <- lm((season17_18)^0.33 ~ Age + G + GS + sqrt(DWS + 20) + sqrt(PTS + 20), data = final_data, subset=train);summary(lm_train2)
 # Calculate R2, RMSE, and MAE
 predictions1 <- lm_train1 %>% predict(test_data)
-data.frame(R2 = R2(predictions1, test_data$season17_18),
-           RMSE = RMSE(predictions1, test_data$season17_18),
-           MAE = MAE(predictions1, test_data$season17_18))
+data.frame(R2 = R2(predictions1, test_data$season17_18^0.33),
+           RMSE = RMSE(predictions1, test_data$season17_18^0.33),
+           MAE = MAE(predictions1, test_data$season17_18^0.33))
 predictions2 <- lm_train2 %>% predict(test_data)
-data.frame(R2 = R2(predictions2, test_data$season17_18),
-           RMSE = RMSE(predictions2, test_data$season17_18),
-           MAE = MAE(predictions2, test_data$season17_18))
+data.frame(R2 = R2(predictions2, test_data$season17_18^0.33),
+           RMSE = RMSE(predictions2, test_data$season17_18^0.33),
+           MAE = MAE(predictions2, test_data$season17_18^0.33))
 ##################################### VERIFY AND CALCULATE PREDICTION INTERVAL ##################################################################
 pred_dame <- predict(lm22a,newdata=data.frame(Age=26, G=75.000000,GS=75.000000,DWS=1.50000000,PTS=2024.000000),interval="prediction")
 pred_dame^3
