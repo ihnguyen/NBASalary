@@ -35,7 +35,7 @@ range(final_data$MP)
 range(final_data$PER)
 range(final_data$TS.)
 range(final_data$X3PAr)
-range(final_data$FTr) # incorrect data that are greater than 1
+range(final_data$FTr)
 range(final_data$ORB.)
 range(final_data$DRB.)
 range(final_data$TRB.)
@@ -93,21 +93,23 @@ anova(null,lm2)
 # Drop rejects (rho>0.9) with high collinearity & lower correlation with the response variable
 lm3 <- update(lm2, ~. - log(eFG. + 20) - log(TRB. + 1) - log(OWS + 20) - sqrt(FG + 20) - sqrt(X2P + 20) - sqrt(X2PA + 20) - log(FT + 20) - 
                 sqrt(TRB + 20) - sqrt(X3PA + 20) - sqrt(FGA)); summary(lm3); performance::check_model(lm3)
-# Drop percentages and FTr due to redundancy and impossible ranges
-lm2a <- update(lm2, ~. - log(AST.+1) -STL. - sqrt(BLK.) - log(TOV.+ 20) - FT. - log(X2P.+ 20) - log(ORB.+1) -log(TRB.+1) - DRB. -log(FTr+4)); summary(lm2a); performance::check_model(lm2a)
+# Drop rejects (rho>0.83) with high collinearity & lower correlation with the response variable
+lm4 <- update(lm3,~. -log(ORB+20)-log(FT+20)-sqrt(X2PA+20)-sqrt(TOV+20)-sqrt(X2P+20)-log(X2P.+20))
+lm4a <- step(lm4, k = log(n));summary(lm4a); performance::check_model(lm4a);
+anova(lm4,lm2);anova(lm4a,lm2)
+lm4b <- update(lm4a,~.-sqrt(X3PAr)-log(VORP+20));summary(lm4b); performance::check_model(lm4b);anova(lm4b,lm2)
+lm4c <- update(lm4b,~.-BPM -PER);summary(lm4c); performance::check_model(lm4c);anova(lm4c,lm2) #################### good model
+lm4d <- update(lm4c,~.-USG.);summary(lm4d); performance::check_model(lm4d);anova(lm4d,lm2)
+lm4e <- update(lm4c,~.-MP);summary(lm4e); performance::check_model(lm4e);anova(lm4e,lm2)
+#lm4 <- update(lm3, ~. - G - MP - WS.48 - log(ORB. + 1) - sqrt(TRB + 20) - log(ORB + 20) - log(VORP + 20) - log(FTA + 6) - 
+#                sqrt(OBPM + 20) - log(FT + 20) - sqrt(TOV + 20) - log(X2P. + 20) - FG. - sqrt(X2P + 20) - sqrt(X2PA + 20) -
+#                log(AST + 20)); summary(lm4); performance::check_model(lm4)
+## Drop percentages due to redundancy
+#lm2a <- update(lm2, ~. - log(AST.+1) -STL. - sqrt(BLK.) - log(TOV.+ 20) - FT. - log(X2P.+ 20) - log(ORB.+1) -log(TRB.+1) - DRB.); summary(lm2a); performance::check_model(lm2a)
 # Remove predictors with high correlation values
-lm3a <- update(lm2a, ~. - log(eFG. + 20) - log(OWS + 20) - sqrt(FG + 20) - sqrt(X2P + 20) - sqrt(X2PA + 20) - log(FT + 20) - 
-                sqrt(TRB + 20) - sqrt(X3PA + 20) - sqrt(FGA)); summary(lm3a); performance::check_model(lm3a)
-# Drop FTr due to impossible range
-lm2b <- update(lm2, ~. -log(FTr+4));summary(lm2b);performance::check_model(lm2b)
+#lm3a <- update(lm2a, ~. - log(eFG. + 20) - log(OWS + 20) - sqrt(FG + 20) - sqrt(X2P + 20) - sqrt(X2PA + 20) - log(FT + 20) - 
+#                sqrt(TRB + 20) - sqrt(X3PA + 20) - sqrt(FGA)); summary(lm3a); performance::check_model(lm3a)
 # Remove predictors with high correlation values
-lm3b <- update(lm2b, ~. - log(eFG. + 20) - log(OWS + 20) - sqrt(FG + 20) - sqrt(X2P + 20) - sqrt(X2PA + 20) - log(FT + 20) - 
-                 sqrt(TRB + 20) - sqrt(X3PA + 20) - sqrt(FGA)); summary(lm3b); performance::check_model(lm3b)
-# Drop FTr due to impossible range, G due to similarity with GS, and FT. due to not meeting assumptions after transformation
-lm2c <- update(lm2, ~. - log(FTr+4) - G - FT.); summary(lm2c); performance::check_model(lm2c)
-# Remove predictors with high correlation values
-lm3c <- update(lm2c, ~. - log(eFG. + 20) - log(OWS + 20) - sqrt(FG + 20) - sqrt(X2P + 20) - sqrt(X2PA + 20) - 
-                 sqrt(TRB + 20) - sqrt(X3PA + 20) - sqrt(FGA)); summary(lm3c); performance::check_model(lm3c)
 ################################ BACKWARDS STEPWISE SELECTION & ELIMINATION (VARIABLE SELECTION) ######################################
 n = nrow(final_data)
 lm19 <- step(lm3, k = log(n));summary(lm19); performance::check_model(lm19)
@@ -118,17 +120,18 @@ lm19 <- step(lm3, k = log(n));summary(lm19); performance::check_model(lm19)
 lm21 <- step(lm2, k = log(n));summary(lm21); performance::check_model(lm21)
   lm21a <- update(lm21,~.-GS);summary(lm21a); performance::check_model(lm21a)
   lm21b <- update(lm21a,~.-log(OWS+20));summary(lm21b); performance::check_model(lm21b)
-  lm21c <- update(lm21b,~.-sqrt(X2P+20));summary(lm21c); performance::check_model(lm21c) 
-lm22 <- step(lm2a, k = log(n));summary(lm22); performance::check_model(lm22)
-  lm22a <- step(lm3a, k = log(n));summary(lm22a); performance::check_model(lm22a)
-  lm22b <- step(lm3b, k = log(n));summary(lm22b); performance::check_model(lm22b)
-  lm22c <- step(lm2b, k = log(n));summary(lm22c); performance::check_model(lm22c)
-  lm22d <- update(lm22c,~. -GS); summary(lm22d);performance::check_model(lm22d)
-  lm22e <- update(lm22d,~. -sqrt(X2P+20)); summary(lm22e);performance::check_model(lm22e)
-  lm22f <- update(lm22e,~. -sqrt(X3PAr)); summary(lm22f);performance::check_model(lm22f)
-  lm22g <- step(lm2a, k = log(n));summary(lm22g);performance::check_model(lm22g)
-  lm22h <- update(lm22a,~.-G);summary(lm22h);performance::check_model(lm22h)
-lm23 <- step(lm2c, k =log(n));summary(lm23);performance::check_model(lm23)
+  lm21c <- update(lm21b,~.-sqrt(X2P+20));summary(lm21c); performance::check_model(lm21c) ## good?
+lm24 <- step(lm4, k=log(n));summary(lm24); performance::check_model(lm24)
+# lm22 <- step(lm2a, k = log(n));summary(lm22); performance::check_model(lm22)
+#   lm22a <- step(lm3a, k = log(n));summary(lm22a); performance::check_model(lm22a)
+#   lm22b <- step(lm3b, k = log(n));summary(lm22b); performance::check_model(lm22b)
+#   lm22c <- step(lm2b, k = log(n));summary(lm22c); performance::check_model(lm22c)
+#   lm22d <- update(lm22c,~. -GS); summary(lm22d);performance::check_model(lm22d)
+#   lm22e <- update(lm22d,~. -sqrt(X2P+20)); summary(lm22e);performance::check_model(lm22e)
+#   lm22f <- update(lm22e,~. -sqrt(X3PAr)); summary(lm22f);performance::check_model(lm22f)
+#   lm22g <- step(lm2a, k = log(n));summary(lm22g);performance::check_model(lm22g)
+#   lm22h <- update(lm22a,~.-G);summary(lm22h);performance::check_model(lm22h)
+# lm23 <- step(lm2c, k =log(n));summary(lm23);performance::check_model(lm23)
 # View scatterplot matrices
 pairs((season17_18)^0.33 ~ Age + G + sqrt(X3PAr) + log(OWS + 20) + sqrt(DWS + 20) + sqrt(FGA), data = final_data)
 round(cor(final_data[,c(1,2,3,8,18,19,27)]),4)
@@ -143,6 +146,13 @@ anova(lm3,lm2) # keep lm3
 anova(lm3a,lm2) # keep lm3a
 anova(lm3b,lm2) # keep lm3b
 anova(lm3c,lm2) # use lm2
+
+anova(lm4,lm2) # keep lm4
+anova(lm4a,lm2) # keep lm4a
+anova(lm4b,lm2) # keep lm4b
+anova(lm4c,lm2) # keep lm4c
+anova(lm4d,lm2) # its okay
+
 anova(lm19,lm2) # keep lm19
 anova(lm19a,lm2) # keep lm19a
 anova(lm19b,lm2) # keep lm19b
@@ -152,14 +162,8 @@ anova(lm21,lm2) # keep lm21
 anova(lm21a,lm2)# keep lm21a
 anova(lm21b,lm2) # keep lm21b
 anova(lm21c,lm2) # use lm2
-anova(lm22,lm2) # keep lm22
-anova(lm22a,lm2) # keep lm22a
-anova(lm22b,lm2) # keep lm22b
-anova(lm22e,lm2) # keep lm22e
-anova(lm22f,lm2) # use lm2
-anova(lm22g,lm2) # keep lm22g
-anova(lm22h,lm2) # use lm2
-anova(lm23,lm2) # use lm2
+anova(lm24,lm2)
+
 # Assign models to a name
 s2 <- summary(lm2)$adj.r.squared
 s2a <- summary(lm2a)$adj.r.squared
@@ -169,6 +173,12 @@ s3 <- summary(lm3)$adj.r.squared
 s3a <- summary(lm3a)$adj.r.squared
 s3b <- summary(lm3b)$adj.r.squared
 s3c <- summary(lm3c)$adj.r.squared
+s4 <- summary(lm4)$adj.r.squared
+s4a <- summary(lm4a)$adj.r.squared
+s4b <- summary(lm4b)$adj.r.squared
+s4c <- summary(lm4c)$adj.r.squared
+s4d <- summary(lm4d)$adj.r.squared
+s4e <- summary(lm4e)$adj.r.squared
 s19 <- summary(lm19)$adj.r.squared
 s19a <- summary(lm19a)$adj.r.squared
 s19b <- summary(lm19b)$adj.r.squared
@@ -189,26 +199,31 @@ s22g <- summary(lm22g)$adj.r.squared
 s22h <- summary(lm22h)$adj.r.squared
 s23 <- summary(lm23)$adj.r.squared
 # View adjusted R squared
+s2;s4;s4a;s4b;s4c;s4d;s4e
 s2;s2a;s2b;s2c;s3;s3a;s3b;s3c;s19;s19a;s19b;s19c;s19d;s21;s21a;s21b;s21c;s22;s22a;s22b;s22c;s22d;s22e;s22f;s22g;s22h;s23
 BIC(lm2,lm2a,lm2b,lm2c,lm3,lm3a,lm3b,lm3c,lm19,lm19a,lm19b,lm19c,lm19d,lm21,lm21a,lm21b,lm21c,lm22,lm22a,lm22b,lm22c,lm22d,lm22e,lm22f,lm22g,lm22h,lm23)
+BIC(lm2,lm4,lm4a,lm4b,lm4c,lm4d,lm4e)
 #lm21,lm22,lm22c,lm22g all have high collinearity
 #lm22d and lm21a have high collinearity
 #lm22a has the next best BIC 
 round(cor(final_data[,c(1,2,3,4,19,46)]),4)
+pairs((season17_18)^0.33 ~ Age + G + MP + DRB. + USG. + 
+        sqrt(WS + 20), data = final_data)
 ################################################ CROSS VALIDATION ##################################################################
 set.seed(111)
 n <- nrow(final_data);n
 z <- floor(0.7*n)
 train <- sample(1:n, z)
 test_data <- final_data[-train,]
-# Train models full model lm2 (lm_train1) and lm22a (lm_train2)
+# Train models full model lm2 (lm_train1) and lm4c (lm_train2)
 lm_train1 <- lm(season17_18^0.33 ~ Age + G + GS + MP + PER + TS. + 
                   sqrt(X3PAr) + log(FTr + 4) + log(ORB. + 1) + DRB. + log(TRB. + 1) + log(AST. + 1) + STL. + sqrt(BLK.) + log(TOV. + 20) + 
                   USG. + log(OWS + 20) + sqrt(DWS + 20) + sqrt(WS + 20) + WS.48 + sqrt(OBPM + 20) + sqrt(DBPM + 20) + BPM + log(VORP + 20) + 
                   sqrt(FG + 20) + FG. + sqrt(FGA) + sqrt(X3PA + 20) + sqrt(X2P + 20) + sqrt(X2PA + 20) + log(X2P. + 20) + log(eFG. + 20) + 
                   log(FT + 20) + log(FTA + 6) + FT. + log(ORB + 20) + sqrt(DRB + 20) + sqrt(TRB + 20) + log(AST + 20) + sqrt(STL + 20) +
                   log(BLK + 20) + sqrt(TOV + 20) + PF + sqrt(PTS + 20), data = final_data, subset=train); summary(lm_train1)
-lm_train2 <- lm((season17_18)^0.33 ~ Age + G + GS + sqrt(DWS + 20) + sqrt(PTS + 20), data = final_data, subset=train);summary(lm_train2)
+lm_train2 <- lm((season17_18)^0.33 ~ Age + G + MP + DRB. + USG. + 
+                  sqrt(WS + 20), data = final_data, subset=train);summary(lm_train2)
 # Calculate R2, RMSE, and MAE
 predictions1 <- lm_train1 %>% predict(test_data)
 data.frame(R2 = R2(predictions1, test_data$season17_18^0.33),
@@ -219,9 +234,10 @@ data.frame(R2 = R2(predictions2, test_data$season17_18^0.33),
            RMSE = RMSE(predictions2, test_data$season17_18^0.33),
            MAE = MAE(predictions2, test_data$season17_18^0.33))
 ##################################### VERIFY AND CALCULATE PREDICTION INTERVAL ##################################################################
-pred_dame <- predict(lm22a,newdata=data.frame(Age=26, G=75.000000,GS=75.000000,DWS=1.50000000,PTS=2024.000000),interval="prediction")
-pred_dame^3
+#pred_dame <- predict(lm4c,newdata=data.frame(),interval="prediction")
+#pred_dame^3
 # RESULTS:
-# fit       lwr        upr
-# 14,772,813 4,543,778 34,362,849
+
+
+
 # Actual Salary = 26,153,057.0
