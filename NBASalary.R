@@ -231,17 +231,14 @@ anova(lm4,lm2)
 # summary(lm6);summary(lm18)
 # performance::check_model(lm6)
 # performance::check_model(lm18)
-
+n <- nrow(final_data)
 # Perform backwards stepwise selection on lm3
 lm19 <- step(lm3, k = log(n))
 summary(lm19); performance::check_model(lm19)
 plot((final_data$season17_18)^0.25, resid(lm19), data=final_data)
 
 # Perform backwards elimination on lm19
-lm19a <- update(lm19,  ~ . - G); summary(lm19a);performance::check_model(lm19a) # insignificant predictors
-lm19b <- update(lm19a,  ~ . - log(FTr +4)); summary(lm19b);performance::check_model(lm19b) # collinearity issue
-lm19c <- update(lm19,  ~ . - MP); summary(lm19c);performance::check_model(lm19c)
-
+lm19a <- update(lm19,  ~ . - log(FTr+4)); summary(lm19a);performance::check_model(lm19a)
 
 # Observed versus fitted values diagnostic plot of DWS transformation
 par(mfrow=c(1,2))
@@ -256,104 +253,32 @@ lines(lowess(predict(lm1),final_data$DWS), col='red')
 # plot((final_data$season17_18)^0.25, resid(lm20), data=final_data)
 
 # Perform backwards stepwise selection on lm2 then backwards elimination
-lm21 <- step(lm2, k = log(n)) 
-lm21a <- update(lm21,~.-log(eFG.+20))
-lm21b <- update(lm21a,~.-FG.)
-lm21c <- update(lm21b,~.-sqrt(X3PAr))
-lm21d <- update(lm21c,~.-sqrt(DWS+20))
-summary(lm21); performance::check_model(lm21) # multicollinearity issues
-summary(lm21a); performance::check_model(lm21a)
-summary(lm21b); performance::check_model(lm21b)
-summary(lm21c); performance::check_model(lm21c)
-summary(lm21d); performance::check_model(lm21d)
-plot((final_data$season17_18)^0.25, resid(lm21c), data=final_data)
+lm21 <- step(lm2, k = log(n));summary(lm21); performance::check_model(lm21) # multicollinearity issues
+lm21a <- update(lm21,~.-FG.);summary(lm21a); performance::check_model(lm21a)
+lm21b <- update(lm21a,~.-log(eFG.+20));summary(lm21b); performance::check_model(lm21b)
+plot((final_data$season17_18)^0.25, resid(lm21b), data=final_data)
 
 # Compare all models against full model
 anova(lm3,lm2) # keep lm3
 anova(lm4,lm2) # use lm2
-anova(lm5,lm2) # use lm2
-anova(lm6,lm2) # use lm2
-anova(lm7,lm2) # use lm2
-anova(lm8,lm2) # use lm2
-anova(lm9,lm2) # use lm2
-anova(lm10,lm2) # use lm2
-anova(lm11,lm2) # use lm2
-anova(lm12,lm2) # use lm2
-anova(lm13,lm2) # use lm2
-anova(lm14,lm2) # use lm2
-anova(lm15,lm2) # use lm2
-anova(lm16,lm2) # use lm2
-anova(lm17,lm2) # use lm2
-anova(lm18,lm2) # use lm2
 anova(lm19,lm2) # keep lm19 ----- high p-value
-anova(lm19a,lm2) # use lm2
-anova(lm19b,lm2) # use lm2
-anova(lm19c,lm2) # use lm2
-anova(lm20,lm2) # use lm2
+anova(lm19a,lm2) # keep lm19a
 anova(lm21,lm2) # keep lm21 ----- high p-value
 anova(lm21a,lm2)# keep lm21a
 anova(lm21b,lm2) # keep lm21b
-anova(lm21c,lm2) # keep lm21c
-anova(lm21d,lm2) # use lm2
-anova(lm22,lm2) # keep lm22
-anova(lm22b,lm2) # keep lm22b
 
 
 # Assign models to a name
-s2 <- summary(lm2)
-s3 <- summary(lm3)
-s4 <- summary(lm4)
-s5 <- summary(lm5)
-s6 <- summary(lm6)
-s7 <- summary(lm7)
-s8 <- summary(lm8)
-s9 <- summary(lm9)
-s10 <- summary(lm10)
-s11 <- summary(lm11)
-s12 <- summary(lm12)
-s13 <- summary(lm13)
-s14 <- summary(lm14)
-s15 <- summary(lm15)
-s16 <- summary(lm16)
-s17 <- summary(lm17)
-s18 <- summary(lm18)
-s19 <- summary(lm19)
-s20 <- summary(lm20)
-s21 <- summary(lm21)
-s21a <- summary(lm21a)
-s21b <- summary(lm21b)
-s21c <- summary(lm21c)
-s21d <- summary(lm21d)
-s22 <- summary(lm22)
-s22b <- summary(lm22b)
+s2 <- summary(lm2)$adj.r.squared
+s3 <- summary(lm3)$adj.r.squared
+s4 <- summary(lm4)$adj.r.squared
+s19 <- summary(lm19)$adj.r.squared
+s19a <- summary(lm19a)$adj.r.squared
+s21 <- summary(lm21)$adj.r.squared
+s21a <- summary(lm21a)$adj.r.squared
+s21b <- summary(lm21b)$adj.r.squared
 
-# Use assigned models to pull adjusted R-squared values
-s2$adj.r.squared
-s3$adj.r.squared
-s4$adj.r.squared
-s5$adj.r.squared
-s6$adj.r.squared
-s7$adj.r.squared
-s8$adj.r.squared
-s9$adj.r.squared
-s10$adj.r.squared
-s11$adj.r.squared
-s12$adj.r.squared
-s13$adj.r.squared
-s14$adj.r.squared
-s15$adj.r.squared
-s16$adj.r.squared
-s17$adj.r.squared
-s18$adj.r.squared
-s19$adj.r.squared # better than full model
-s20$adj.r.squared
-s21$adj.r.squared # better than full model
-s21a$adj.r.squared
-s21b$adj.r.squared
-s21c$adj.r.squared
-s21d$adj.r.squared
-s22$adj.r.squared
-s22b$adj.r.squared
+s2;s3;s4;s19;s19a;s21;s21a;s21b # s19 and s21 but s21 has high collinearity
 
 # Using lm19 to predict Curry's and Lillard's 2017-18 salary
 pred_curry0 <- predict(lm19,newdata = data.frame(Age=28,G=79.000000,MP=2638.0000, FTr=0.25100000,DWS=3.90000000,FTA=362.000000), interval="prediction")
