@@ -354,28 +354,28 @@ summary(lm_train3)
 summary(lm_train4)
 
 predictions <- lm_train %>% predict(test_data)
-data.frame(R2 = R2(predictions, test_data$season17_18),
-           RMSE = RMSE(predictions, test_data$season17_18),
-           MAE = MAE(predictions, test_data$season17_18))
+data.frame(R2 = R2(predictions, test_data$season17_18^0.25),
+           RMSE = RMSE(predictions, test_data$season17_18^0.25),
+           MAE = MAE(predictions, test_data$season17_18^0.25))
 
 predictions1 <- lm_train1 %>% predict(test_data)
-data.frame(R2 = R2(predictions1, test_data$season17_18),
-           RMSE = RMSE(predictions1, test_data$season17_18),
-           MAE = MAE(predictions1, test_data$season17_18))
+data.frame(R2 = R2(predictions1, test_data$season17_18^0.25),
+           RMSE = RMSE(predictions1, test_data$season17_18^0.25),
+           MAE = MAE(predictions1, test_data$season17_18^0.25))
 
 predictions2 <- lm_train2 %>% predict(test_data)
-data.frame(R2 = R2(predictions2, test_data$season17_18),
-           RMSE = RMSE(predictions2, test_data$season17_18),
-           MAE = MAE(predictions2, test_data$season17_18))
+data.frame(R2 = R2(predictions2, test_data$season17_18^0.25),
+           RMSE = RMSE(predictions2, test_data$season17_18^0.25),
+           MAE = MAE(predictions2, test_data$season17_18^0.25))
 
 predictions3 <- lm_train3 %>% predict(test_data)
-data.frame(R2 = R2(predictions3, test_data$season17_18),
-           RMSE = RMSE(predictions3, test_data$season17_18),
-           MAE = MAE(predictions3, test_data$season17_18))
+data.frame(R2 = R2(predictions3, test_data$season17_18^0.25),
+           RMSE = RMSE(predictions3, test_data$season17_18^0.25),
+           MAE = MAE(predictions3, test_data$season17_18^0.25))
 predictions4 <- lm_train4 %>% predict(test_data)
-data.frame(R2 = R2(predictions4, test_data$season17_18),
-           RMSE = RMSE(predictions4, test_data$season17_18),
-           MAE = MAE(predictions4, test_data$season17_18))
+data.frame(R2 = R2(predictions4, test_data$season17_18^0.25),
+           RMSE = RMSE(predictions4, test_data$season17_18^0.25),
+           MAE = MAE(predictions4, test_data$season17_18^0.25))
 
 # Same RMSE for all models except lm21 (lm_train3) and lm22b are one less
 
