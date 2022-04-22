@@ -235,10 +235,19 @@ data.frame(R2 = R2(predictions2, test_data$season17_18^0.33),
            RMSE = RMSE(predictions2, test_data$season17_18^0.33),
            MAE = MAE(predictions2, test_data$season17_18^0.33))
 ##################################### VERIFY AND CALCULATE PREDICTION INTERVAL ##################################################################
-#pred_dame <- predict(lm4c,newdata=data.frame(),interval="prediction")
-#pred_dame^3
-# RESULTS:
+# Test predictability on 2017-18 salary
+pred_dame1 <- predict(lm4c,newdata = data.frame(Age=26,G=75.000000,MP = 2694.00000,DRB. = 13.300000,USG. = 31.500000 , WS=10.30000000), interval="prediction")
+pred_dame1^3
+# fit          lwr          upr
+# 18,273,322   6,152,846    40,546,556
+# Actual 2017-18 Salary = 26,153,057.0
 
+# Test predictability on 2020-21 salary
+# https://www.basketball-reference.com/leagues/NBA_2021_advanced.html
+pred_dame2 <- predict(lm4c,newdata = data.frame(Age=30,G=67,MP = 2398,DRB. = 11.5,USG. = 31.4 , WS=10.4), interval="prediction")
+pred_dame2^3
+# fit          lwr          upr
+# 17,863,938   5,929,018    39,942,632
+# Actual 2021-22 Salary = 31,626,953
+# Note: 2020-21 salary was calculated rather than 2021-22 salary due to Lillard's injury which doesn't give an accurate estimated salary
 
-
-# Actual Salary = 26,153,057.0
