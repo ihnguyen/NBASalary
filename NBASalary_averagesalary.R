@@ -90,6 +90,7 @@ par(mfrow=c(2,3));qqPlot(final_data$season17_18);qqPlot((final_data$season17_18)
 null <- lm((season17_18)^0.33~1, data=final_data)
 anova(null,lm2)
 ############################### BACKWARDS ELIMINATION (VARIABLE SELECTION) ############################################################
+n = nrow(final_data)
 # Drop rejects (rho>0.9) with high collinearity & lower correlation with the response variable
 lm3 <- update(lm2, ~. - log(eFG. + 20) - log(TRB. + 1) - log(OWS + 20) - sqrt(FG + 20) - sqrt(X2P + 20) - sqrt(X2PA + 20) - log(FT + 20) - 
                 sqrt(TRB + 20) - sqrt(X3PA + 20) - sqrt(FGA)); summary(lm3); performance::check_model(lm3)
@@ -100,7 +101,7 @@ anova(lm4,lm2);anova(lm4a,lm2)
 lm4b <- update(lm4a,~.-sqrt(X3PAr)-log(VORP+20));summary(lm4b); performance::check_model(lm4b);anova(lm4b,lm2)
 lm4c <- update(lm4b,~.-BPM -PER);summary(lm4c); performance::check_model(lm4c);anova(lm4c,lm2) #################### good model
 lm4d <- update(lm4c,~.-USG.);summary(lm4d); performance::check_model(lm4d);anova(lm4d,lm2)
-lm4e <- update(lm4c,~.-MP);summary(lm4e); performance::check_model(lm4e);anova(lm4e,lm2)
+lm4e <- update(lm4c,~.-G);summary(lm4e); performance::check_model(lm4e);anova(lm4e,lm2)
 #lm4 <- update(lm3, ~. - G - MP - WS.48 - log(ORB. + 1) - sqrt(TRB + 20) - log(ORB + 20) - log(VORP + 20) - log(FTA + 6) - 
 #                sqrt(OBPM + 20) - log(FT + 20) - sqrt(TOV + 20) - log(X2P. + 20) - FG. - sqrt(X2P + 20) - sqrt(X2PA + 20) -
 #                log(AST + 20)); summary(lm4); performance::check_model(lm4)
@@ -110,8 +111,8 @@ lm4e <- update(lm4c,~.-MP);summary(lm4e); performance::check_model(lm4e);anova(l
 #lm3a <- update(lm2a, ~. - log(eFG. + 20) - log(OWS + 20) - sqrt(FG + 20) - sqrt(X2P + 20) - sqrt(X2PA + 20) - log(FT + 20) - 
 #                sqrt(TRB + 20) - sqrt(X3PA + 20) - sqrt(FGA)); summary(lm3a); performance::check_model(lm3a)
 # Remove predictors with high correlation values
+plot(final_data$G, final_data$MP,data=final_data)
 ################################ BACKWARDS STEPWISE SELECTION & ELIMINATION (VARIABLE SELECTION) ######################################
-n = nrow(final_data)
 lm19 <- step(lm3, k = log(n));summary(lm19); performance::check_model(lm19)
   lm19a <- update(lm19,  ~ . - sqrt(X3PAr)); summary(lm19a);performance::check_model(lm19a)
   lm19b <- update(lm19a,  ~ . - PER); summary(lm19b);performance::check_model(lm19b)
