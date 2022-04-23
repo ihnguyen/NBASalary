@@ -276,6 +276,6 @@ ggplot(e1,aes(x=variable,y=value)) + geom_boxplot(fill='#FFF2CC', color="black")
 ggplot(e2,aes(x=variable,y=value)) + geom_boxplot(fill='#FFF2CC', color="black") + xlab("") + ylab("")+ theme(text = element_text(size = 12))
 ggplot(e3,aes(x=variable,y=value)) + geom_boxplot(fill='#B6D7A8', color="black") + scale_y_continuous(labels = label_number(suffix = " M", scale = 1e-6)) + xlab("") + ylab("")+ theme(text = element_text(size = 12))
 #Scatterplot matrix untransformed
-pairs(season17_18~Age+G+DRB.+USG.+WS,data=final_data)
+pairs(season17_18~Age+G+MP+DRB.+USG.+WS,data=final_data)
 #Summary Table
 t1 <- tbl_regression(lm4c)
