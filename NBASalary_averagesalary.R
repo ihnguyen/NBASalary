@@ -1,6 +1,6 @@
 ################################################ DATA CLEANING AND TRANSFORMATION ####################################################
 # Load libraries
-library(tidyverse);library(car);library(emmeans);library(MASS);library(reshape);library(reshape2);library(faraway);library(caret)
+library(tidyverse);library(car);library(emmeans);library(MASS);library(reshape);library(reshape2);library(faraway);library(caret);library(scales)
 # Read csv files
 salary_data <- read.csv("NBA_season1718_salary.csv"); stats_data <- read.csv("Seasons_Stats.csv")
 dim(salary_data);dim(stats_data)
@@ -250,4 +250,28 @@ pred_dame2^3
 # 17,863,938   5,929,018    39,942,632
 # Actual 2021-22 Salary = 31,626,953
 # Note: 2020-21 salary was calculated rather than 2021-22 salary due to Lillard's injury which doesn't give an accurate estimated salary
-
+############################################################## BOX PLOTS ###########################################################################
+# Observe data with statistically significant predictors (lm19) using Box Plot
+dd <- final_data %>% 
+  dplyr::rename(Games = G,
+                Minutes Played = MP,
+                Defensive Rebound Percentage = DRB.,
+                Usage Percentage = USG.
+                Win Shares = WS) %>% 
+  dplyr::mutate(Salary = season17_18)
+d <- melt(dd, id="season17_18")
+ggplot(d,aes(x=variable,y=value,color=variable)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(size=10, angle=45))
+dt <- dd[,c(1,2,3,5,11,17,20,47)]
+dt1 <- dd[,c(1,2,3,11,17,20)]
+dt2 <- dd[,c(1,5)]
+dt3 <- dd[,c(1,47)]
+e <- melt(dt,id="season17_18")
+e1 <- melt(dt1,id="season17_18")
+e2 <- melt(dt2,id="season17_18")
+e3 <- melt(dt3,id="season17_18")
+ggplot(e,aes(x=variable,y=value)) + geom_boxplot() + xlab("") + ylab("")
+ggplot(e1,aes(x=variable,y=value)) + geom_boxplot() + xlab("") + ylab("")
+ggplot(e2,aes(x=variable,y=value)) + geom_boxplot() + xlab("") + ylab("")
+ggplot(e3,aes(x=variable,y=value)) + geom_boxplot() + scale_y_continuous(labels = label_number(suffix = " M", scale = 1e-6)) + xlab("") + ylab("")
