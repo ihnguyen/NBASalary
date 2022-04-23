@@ -1,6 +1,6 @@
 ################################################ DATA CLEANING AND TRANSFORMATION ####################################################
 # Load libraries
-library(tidyverse);library(car);library(emmeans);library(MASS);library(reshape);library(reshape2);library(faraway);library(caret);library(scales)
+library(tidyverse);library(car);library(emmeans);library(MASS);library(reshape);library(reshape2);library(faraway);library(caret);library(scales);library(gtsummary)
 # Read csv files
 salary_data <- read.csv("NBA_season1718_salary.csv"); stats_data <- read.csv("Seasons_Stats.csv")
 dim(salary_data);dim(stats_data)
@@ -275,3 +275,7 @@ ggplot(e,aes(x=variable,y=value)) + geom_boxplot() + xlab("") + ylab("")
 ggplot(e1,aes(x=variable,y=value)) + geom_boxplot(fill='#FFF2CC', color="black") + xlab("") + ylab("") + theme(axis.text.x = element_text(size=8, angle=45))
 ggplot(e2,aes(x=variable,y=value)) + geom_boxplot(fill='#FFF2CC', color="black") + xlab("") + ylab("")+ theme(text = element_text(size = 12))
 ggplot(e3,aes(x=variable,y=value)) + geom_boxplot(fill='#B6D7A8', color="black") + scale_y_continuous(labels = label_number(suffix = " M", scale = 1e-6)) + xlab("") + ylab("")+ theme(text = element_text(size = 12))
+#Scatterplot matrix untransformed
+pairs(season17_18~Age+G+DRB.+USG.+WS,data=final_data)
+#Summary Table
+t1 <- tbl_regression(lm4c)
