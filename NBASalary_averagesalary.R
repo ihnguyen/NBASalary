@@ -253,11 +253,11 @@ pred_dame2^3
 ############################################################## BOX PLOTS ###########################################################################
 # Observe data with statistically significant predictors (lm19) using Box Plot
 dd <- final_data %>% 
-  dplyr::rename(Games = G,
-                Minutes Played = MP,
-                Defensive Rebound Percentage = DRB.,
-                Usage Percentage = USG.
-                Win Shares = WS) %>% 
+  dplyr::rename(Games = G) %>% 
+  dplyr::rename(MinutesPlayed = MP) %>% 
+  dplyr::rename(DefensiveReboundPercentage = DRB.) %>% 
+  dplyr::rename(UsagePercentage = USG.) %>% 
+  dplyr::rename(WinShares = WS) %>%
   dplyr::mutate(Salary = season17_18)
 d <- melt(dd, id="season17_18")
 ggplot(d,aes(x=variable,y=value,color=variable)) +
@@ -272,6 +272,6 @@ e1 <- melt(dt1,id="season17_18")
 e2 <- melt(dt2,id="season17_18")
 e3 <- melt(dt3,id="season17_18")
 ggplot(e,aes(x=variable,y=value)) + geom_boxplot() + xlab("") + ylab("")
-ggplot(e1,aes(x=variable,y=value)) + geom_boxplot() + xlab("") + ylab("")
-ggplot(e2,aes(x=variable,y=value)) + geom_boxplot() + xlab("") + ylab("")
-ggplot(e3,aes(x=variable,y=value)) + geom_boxplot() + scale_y_continuous(labels = label_number(suffix = " M", scale = 1e-6)) + xlab("") + ylab("")
+ggplot(e1,aes(x=variable,y=value)) + geom_boxplot(fill='#FFF2CC', color="black") + xlab("") + ylab("") + theme(axis.text.x = element_text(size=8, angle=45))
+ggplot(e2,aes(x=variable,y=value)) + geom_boxplot(fill='#FFF2CC', color="black") + xlab("") + ylab("")+ theme(text = element_text(size = 12))
+ggplot(e3,aes(x=variable,y=value)) + geom_boxplot(fill='#B6D7A8', color="black") + scale_y_continuous(labels = label_number(suffix = " M", scale = 1e-6)) + xlab("") + ylab("")+ theme(text = element_text(size = 12))
