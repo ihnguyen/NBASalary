@@ -1,6 +1,6 @@
 ################################################ DATA CLEANING AND TRANSFORMATION ####################################################
 # Load libraries
-library(tidyverse);library(car);library(emmeans);library(MASS);library(reshape);library(reshape2);library(faraway);library(caret);library(scales);library(gtsummary)
+library(tidyverse);library(car);library(emmeans);library(MASS);library(reshape);library(reshape2);library(faraway);library(caret);library(scales);library(gtsummary);library(knitr)library(kableExtra);library(gt)
 # Read csv files
 salary_data <- read.csv("NBA_season1718_salary.csv"); stats_data <- read.csv("Seasons_Stats.csv")
 dim(salary_data);dim(stats_data)
@@ -250,8 +250,8 @@ pred_dame2^3
 # 17,863,938   5,929,018    39,942,632
 # Actual 2021-22 Salary = 31,626,953
 # Note: 2020-21 salary was calculated rather than 2021-22 salary due to Lillard's injury which doesn't give an accurate estimated salary
-############################################################## BOX PLOTS ###########################################################################
-# Observe data with statistically significant predictors (lm19) using Box Plot
+############################################################## FIGURES AND TABLES ###########################################################################
+# Observe data with statistically significant predictors (lm4c) using Box Plot
 dd <- final_data %>% 
   dplyr::rename(Games = G) %>% 
   dplyr::rename(MinutesPlayed = MP) %>% 
@@ -275,7 +275,30 @@ ggplot(e,aes(x=variable,y=value)) + geom_boxplot() + xlab("") + ylab("")
 ggplot(e1,aes(x=variable,y=value)) + geom_boxplot(fill='#FFF2CC', color="black") + xlab("") + ylab("") + theme(axis.text.x = element_text(size=8, angle=45))
 ggplot(e2,aes(x=variable,y=value)) + geom_boxplot(fill='#FFF2CC', color="black") + xlab("") + ylab("")+ theme(text = element_text(size = 12))
 ggplot(e3,aes(x=variable,y=value)) + geom_boxplot(fill='#B6D7A8', color="black") + scale_y_continuous(labels = label_number(suffix = " M", scale = 1e-6)) + xlab("") + ylab("")+ theme(text = element_text(size = 12))
+# Boxplots without color for research paper
+layout(matrix(c(1,2,3),1,3,byrow=T))
+ggplot(e1,aes(x=variable,y=value)) + geom_boxplot() + xlab("") + ylab("") + theme(axis.text.x = element_text(size=8, angle=45))
+ggplot(e2,aes(x=variable,y=value)) + geom_boxplot() + xlab("") + ylab("")+ theme(text = element_text(size = 12))
+ggplot(e3,aes(x=variable,y=value)) + geom_boxplot() + scale_y_continuous(labels = label_number(suffix = " M", scale = 1e-6)) + xlab("") + ylab("")+ theme(text = element_text(size = 12))
 #Scatterplot matrix untransformed
 pairs(season17_18~Age+G+MP+DRB.+USG.+WS,data=final_data)
-#Summary Table
-t1 <- tbl_regression(lm4c)
+# Summary Table with gt package
+t1 <- tbl_regression(lm4c);t1
+# Summary Table with knitr::kableExtra
+knit <- coef(summary(lm4c))
+knit %>% 
+  kbl() %>% 
+  kable_classic(full_width=F,html_font="Arial")
+# Descriptive Statistics with gt package
+list <- final_data[1:12] %>% 
+  tbl_summary(
+    statistic = ~"{mean}; {median} ({min},{max})"); list
+list1 <- final_data[13:24] %>% 
+  tbl_summary(
+    statistic = ~"{mean}; {median} ({min},{max})"); list1
+list2 <- final_data[25:36] %>% 
+  tbl_summary(
+    statistic = ~"{mean}; {median} ({min},{max})"); list2
+list3 <- final_data[37:46] %>% 
+  tbl_summary(
+    statistic = ~"{mean}; {median} ({min},{max})"); list3
