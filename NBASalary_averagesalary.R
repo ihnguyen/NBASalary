@@ -1,6 +1,6 @@
 ################################################ DATA CLEANING AND TRANSFORMATION ####################################################
 # Load libraries
-library(tidyverse);library(car);library(emmeans);library(MASS);library(reshape);library(reshape2);library(faraway);library(caret);library(scales);library(gtsummary);library(knitr)library(kableExtra);library(gt)
+library(tidyverse);library(car);library(emmeans);library(MASS);library(reshape);library(reshape2);library(faraway);library(caret);library(scales);library(gtsummary);library(knitr);library(kableExtra);library(gt)
 # Read csv files
 salary_data <- read.csv("NBA_season1718_salary.csv"); stats_data <- read.csv("Seasons_Stats.csv")
 dim(salary_data);dim(stats_data)
@@ -235,20 +235,20 @@ test_data <- final_data[-train,]
 # Train models full model lm2 (lm_train1) and lm4i (lm_train2)
 lm_train1 <- lm(season17_18^0.33 ~ Age + G + GS + MP + PER + TS. + 
                   sqrt(X3PAr) + log(FTr + 4) + log(ORB. + 1) + DRB. + log(TRB. + 1) + log(AST. + 1) + STL. + sqrt(BLK.) + log(TOV. + 20) + 
-                  USG. + log(OWS + 20) + sqrt(DWS + 20) + sqrt(WS + 20) + WS.48 + sqrt(OBPM + 20) + sqrt(DBPM + 20) + BPM + log(VORP + 20) + 
+                  log(USG.) + log(OWS + 20) + sqrt(DWS + 20) + sqrt(WS + 20) + WS.48 + sqrt(OBPM + 20) + sqrt(DBPM + 20) + BPM + log(VORP + 20) + 
                   sqrt(FG + 20) + FG. + sqrt(FGA) + sqrt(X3PA + 20) + sqrt(X2P + 20) + sqrt(X2PA + 20) + log(X2P. + 20) + log(eFG. + 20) + 
                   log(FT + 20) + log(FTA + 6) + FT. + log(ORB + 20) + sqrt(DRB + 20) + sqrt(TRB + 20) + log(AST + 20) + sqrt(STL + 20) +
                   log(BLK + 20) + sqrt(TOV + 20) + PF + sqrt(PTS + 20), data = final_data, subset=train); summary(lm_train1)
 lm_train2 <- lm((season17_18)^0.33 ~ Age + G + sqrt(DWS+20) + sqrt(PTS+20), data = final_data, subset=train);summary(lm_train2)
 # Calculate R2, RMSE, and MAE
 predictions1 <- lm_train1 %>% predict(test_data)
-data.frame(R2 = R2(predictions1, test_data$season17_18^0.33),
+aa <- data.frame(R2 = R2(predictions1, test_data$season17_18^0.33),
            RMSE = RMSE(predictions1, test_data$season17_18^0.33),
-           MAE = MAE(predictions1, test_data$season17_18^0.33))
+           MAE = MAE(predictions1, test_data$season17_18^0.33)); aa
 predictions2 <- lm_train2 %>% predict(test_data)
-data.frame(R2 = R2(predictions2, test_data$season17_18^0.33),
+ab <-data.frame(R2 = R2(predictions2, test_data$season17_18^0.33),
            RMSE = RMSE(predictions2, test_data$season17_18^0.33),
-           MAE = MAE(predictions2, test_data$season17_18^0.33))
+           MAE = MAE(predictions2, test_data$season17_18^0.33)); ab
 ##################################### VERIFY AND CALCULATE PREDICTION INTERVAL ##################################################################
 # Test predictability on 2017-18 salary
 pred_dame1 <- predict(lm4i,newdata = data.frame(Age=26,G=75.000000,DWS=1.50000000,PTS=2024.000000), interval="prediction")
@@ -266,7 +266,7 @@ pred_dame2^3
 # Actual 2021-22 Salary = 31,626,953
 # Note: 2020-21 salary was calculated rather than 2021-22 salary due to Lillard's injury which doesn't give an accurate estimated salary
 ############################################################## FIGURES AND TABLES ###########################################################################
-# Observe data with statistically significant predictors (lm4c) using Box Plot
+# Observe data with statistically significant predictors (lm4i) using Box Plot
 dd <- final_data %>% 
   dplyr::rename("Games" = G) %>% 
   dplyr::rename("Defensive Win Shares" = DWS) %>% 
@@ -276,33 +276,27 @@ d <- melt(dd, id="season17_18")
 ggplot(d,aes(x=variable,y=value,color=variable)) +
   geom_boxplot() +
   theme(axis.text.x = element_text(size=10, angle=45))
-dt <- dd[,c(1,2,3,19,46)]
-dt1 <- dd[,c(1,2,3)]
-dt2 <- dd[,c(1,19)]
-dt3 <- dd[,c(1,46)]
-dt4 <- dd[,c(1,47)]
-e <- melt(dt,id="season17_18")
-e1 <- melt(dt1,id="season17_18")
-e2 <- melt(dt2,id="season17_18")
-e3 <- melt(dt3,id="season17_18")
-e4 <- melt(dt4,id="season17_18")
-
+dt <- dd[,c(1,2,3,19,46)]; e <- melt(dt,id="season17_18")
+dt1 <- dd[,c(1,2,3)]; e1 <- melt(dt1,id="season17_18")
+dt2 <- dd[,c(1,19)]; e2 <- melt(dt2,id="season17_18")
+dt3 <- dd[,c(1,46)]; e3 <- melt(dt3,id="season17_18")
+dt4 <- dd[,c(1,47)]; e4 <- melt(dt4,id="season17_18")
 ggplot(e,aes(x=variable,y=value)) + geom_boxplot() + xlab("") + ylab("")
 ggplot(e1,aes(x=variable,y=value)) + geom_boxplot(fill='#FFF2CC', color="black") + xlab("") + ylab("")+ theme(text = element_text(size = 12))# + theme(axis.text.x = element_text(size=8, angle=45))
 ggplot(e2,aes(x=variable,y=value)) + geom_boxplot(fill='#FFF2CC', color="black") + xlab("") + ylab("")+ theme(text = element_text(size = 12))
 ggplot(e3,aes(x=variable,y=value)) + geom_boxplot(fill='#FFF2CC', color="black") + xlab("") + ylab("")+ theme(text = element_text(size = 12))
 ggplot(e4,aes(x=variable,y=value)) + geom_boxplot(fill='#B6D7A8', color="black") + scale_y_continuous(labels = label_number(suffix = " M", scale = 1e-6)) + xlab("") + ylab("")+ theme(text = element_text(size = 12))
 # Boxplots without color for research paper
-layout(matrix(c(1,2,3),1,3,byrow=T))
-ggplot(e1,aes(x=variable,y=value)) + geom_boxplot() + xlab("") + ylab("") + theme(axis.text.x = element_text(size=8, angle=45))
+ggplot(e1,aes(x=variable,y=value)) + geom_boxplot() + xlab("") + ylab("")+ theme(text = element_text(size = 12))# + theme(axis.text.x = element_text(size=8, angle=45))
 ggplot(e2,aes(x=variable,y=value)) + geom_boxplot() + xlab("") + ylab("")+ theme(text = element_text(size = 12))
-ggplot(e3,aes(x=variable,y=value)) + geom_boxplot() + scale_y_continuous(labels = label_number(suffix = " M", scale = 1e-6)) + xlab("") + ylab("")+ theme(text = element_text(size = 12))
+ggplot(e3,aes(x=variable,y=value)) + geom_boxplot() + xlab("") + ylab("")+ theme(text = element_text(size = 12))
+ggplot(e4,aes(x=variable,y=value)) + geom_boxplot() + scale_y_continuous(labels = label_number(suffix = " M", scale = 1e-6)) + xlab("") + ylab("")+ theme(text = element_text(size = 12))
 #Scatterplot matrix untransformed
-pairs(season17_18~Age+G+MP+DRB.+USG.+WS,data=final_data)
+pairs(season17_18~Age+G+DWS+PTS,data=final_data)
 # Summary Table with gt package
-t1 <- tbl_regression(lm4c);t1
+t1 <- tbl_regression(lm4i);t1
 # Summary Table with knitr::kableExtra
-knit <- coef(summary(lm4c))
+knit <- coef(summary(lm4i))
 knit %>% 
   kbl() %>% 
   kable_classic(full_width=F,html_font="Arial")
@@ -319,3 +313,6 @@ list2 <- final_data[25:36] %>%
 list3 <- final_data[37:46] %>% 
   tbl_summary(
     statistic = ~"{mean}; {median} ({min},{max})"); list3
+# Cross-Validation Tables
+aa %>% kbl() %>% kable_classic(full_width=F,html_font="Arial")
+ab %>% kbl() %>% kable_classic(full_width=F,html_font="Arial")
