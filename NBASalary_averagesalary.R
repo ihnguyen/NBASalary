@@ -288,7 +288,7 @@ e3 <- melt(dt3,id="season17_18")
 e4 <- melt(dt4,id="season17_18")
 
 ggplot(e,aes(x=variable,y=value)) + geom_boxplot() + xlab("") + ylab("")
-ggplot(e1,aes(x=variable,y=value)) + geom_boxplot(fill='#FFF2CC', color="black") + xlab("") + ylab("") + theme(axis.text.x = element_text(size=8, angle=45))
+ggplot(e1,aes(x=variable,y=value)) + geom_boxplot(fill='#FFF2CC', color="black") + xlab("") + ylab("")+ theme(text = element_text(size = 12))# + theme(axis.text.x = element_text(size=8, angle=45))
 ggplot(e2,aes(x=variable,y=value)) + geom_boxplot(fill='#FFF2CC', color="black") + xlab("") + ylab("")+ theme(text = element_text(size = 12))
 ggplot(e3,aes(x=variable,y=value)) + geom_boxplot(fill='#FFF2CC', color="black") + xlab("") + ylab("")+ theme(text = element_text(size = 12))
 ggplot(e4,aes(x=variable,y=value)) + geom_boxplot(fill='#B6D7A8', color="black") + scale_y_continuous(labels = label_number(suffix = " M", scale = 1e-6)) + xlab("") + ylab("")+ theme(text = element_text(size = 12))
