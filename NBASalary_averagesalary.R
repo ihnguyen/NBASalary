@@ -265,7 +265,7 @@ pred_dame2^3
 # 13,935,753 4,048,273 33,359,456
 # Actual 2021-22 Salary = 31,626,953
 # Note: 2020-21 salary was calculated rather than 2021-22 salary due to Lillard's injury which doesn't give an accurate estimated salary
-############################################################## FIGURES AND TABLES ###########################################################################
+############################################################## FIGURES  ###########################################################################
 # Observe data with statistically significant predictors (lm4i) using Box Plot
 dd <- final_data %>% 
   dplyr::rename("Games" = G) %>% 
@@ -293,6 +293,10 @@ ggplot(e3,aes(x=variable,y=value)) + geom_boxplot() + xlab("") + ylab("")+ theme
 ggplot(e4,aes(x=variable,y=value)) + geom_boxplot() + scale_y_continuous(labels = label_number(suffix = " M", scale = 1e-6)) + xlab("") + ylab("")+ theme(text = element_text(size = 12))
 #Scatterplot matrix untransformed
 pairs(season17_18~Age+G+DWS+PTS,data=final_data)
+############################################################## TABLES ###########################################################################
+# Cross-Validation Tables
+aa %>% kbl() %>% kable_classic(full_width=F,html_font="Arial")
+ab %>% kbl() %>% kable_classic(full_width=F,html_font="Arial")
 # Summary Table with gt package
 t1 <- tbl_regression(lm4i);t1
 # Summary Table with knitr::kableExtra
@@ -300,7 +304,7 @@ knit <- coef(summary(lm4i))
 knit %>% 
   kbl() %>% 
   kable_classic(full_width=F,html_font="Arial")
-# Descriptive Statistics with gt package
+# Descriptive Statistics with gt package (may not use since similar to boxplots)
 list <- final_data[1:12] %>% 
   tbl_summary(
     statistic = ~"{mean}; {median} ({min},{max})"); list
@@ -313,6 +317,3 @@ list2 <- final_data[25:36] %>%
 list3 <- final_data[37:46] %>% 
   tbl_summary(
     statistic = ~"{mean}; {median} ({min},{max})"); list3
-# Cross-Validation Tables
-aa %>% kbl() %>% kable_classic(full_width=F,html_font="Arial")
-ab %>% kbl() %>% kable_classic(full_width=F,html_font="Arial")
