@@ -79,19 +79,16 @@ round(cor(final_data[,c(1:46)]),4)
 lm1 <- lm(season17_18 ~ ., data = final_data); summary(lm1);performance::check_model(lm1)
 # Fit regression with transformed predictors and response (Full model)
 lm2 <- lm((season17_18)^0.33~Age+G+GS+MP+PER+TS.+sqrt(X3PAr)+log(FTr+4)+log(ORB.+1)+DRB.+log(TRB.+1)+log(AST.+1)+STL.+sqrt(BLK.)
-<<<<<<< HEAD
-          + log(TOV.+ 20) + log(USG. +1) + log(OWS+ 20) + sqrt(DWS+ 20) + sqrt(WS+ 20) + WS.48 + sqrt(OBPM + 20) + sqrt(DBPM + 20) + BPM + log(VORP+ 20) + sqrt(FG+ 20) + FG.+ sqrt(FGA) + sqrt(X3PA+ 20) + sqrt(X2P+ 20) + 
-=======
           + log(TOV.+ 20) + log(USG.) + log(OWS+ 20) + sqrt(DWS+ 20) + sqrt(WS+ 20) + WS.48 + sqrt(OBPM + 20) + sqrt(DBPM + 20) + BPM + log(VORP+ 20) + sqrt(FG+ 20) + FG.+ sqrt(FGA) + sqrt(X3PA+ 20) + sqrt(X2P+ 20) + 
->>>>>>> 91f4974a7e80624ada94c05a9ab1a2ae9df3c19b
             sqrt(X2PA+ 20) + log(X2P.+ 20) + log(eFG.+ 20) + log(FT+ 20) + log(FTA +6) + FT. + log(ORB+ 20) + sqrt(DRB+ 20) + sqrt(TRB+ 20) + log(AST+ 20) + sqrt(STL+ 20) + log(BLK+ 20) + sqrt(TOV+ 20) + PF + sqrt(PTS+ 20)
           , data=final_data); summary(lm2); performance::check_model(lm2)
 # Check if response needs to be transformed using Box-Cox transformation
 ptf<- powerTransform(season17_18~.,data = final_data)
 summary(ptf)
-
-
-par(mfrow=c(2,3));qqPlot(final_data$season17_18);qqPlot((final_data$season17_18)^0.33);hist(final_data$season17_18);hist((final_data$season17_18)^0.33);plot(final_data$season17_18,resid(lm2),data=final_data);plot((final_data$season17_18)^0.33,resid(lm2),data=final_data)
+# Visual Diagnositics
+par(mfrow=c(1,2));qqPlot(final_data$season17_18);qqPlot((final_data$season17_18)^0.33)
+par(mfrow=c(1,2));hist(final_data$season17_18);hist((final_data$season17_18)^0.33)
+par(mfrow=c(1,2));plot(final_data$season17_18,resid(lm2),data=final_data);plot((final_data$season17_18)^0.33,resid(lm2),data=final_data)
 # Is there a relationship between the response and at least one predictor in our regression model?
 null <- lm((season17_18)^0.33~1, data=final_data)
 anova(null,lm2)
@@ -111,18 +108,7 @@ lm4e <- update(lm4d,~.-sqrt(DBPM + 20));summary(lm4e); performance::check_model(
 lm4f <- update(lm4e,~.-DRB.);summary(lm4f); performance::check_model(lm4f);anova(lm4f,lm2)
 lm4g <- update(lm4f,~.-BPM);summary(lm4g); performance::check_model(lm4g);anova(lm4g,lm2)
 lm4h <- update(lm4g,~.-PER);summary(lm4h); performance::check_model(lm4h);anova(lm4h,lm2)
-
 lm4i <- step(lm4, k=log(n)); summary(lm4i); performance::check_model(lm4i)
-
-#lm4 <- update(lm3, ~. - G - MP - WS.48 - log(ORB. + 1) - sqrt(TRB + 20) - log(ORB + 20) - log(VORP + 20) - log(FTA + 6) - 
-#                sqrt(OBPM + 20) - log(FT + 20) - sqrt(TOV + 20) - log(X2P. + 20) - FG. - sqrt(X2P + 20) - sqrt(X2PA + 20) -
-#                log(AST + 20)); summary(lm4); performance::check_model(lm4)
-## Drop percentages due to redundancy
-#lm2a <- update(lm2, ~. - log(AST.+1) -STL. - sqrt(BLK.) - log(TOV.+ 20) - FT. - log(X2P.+ 20) - log(ORB.+1) -log(TRB.+1) - DRB.); summary(lm2a); performance::check_model(lm2a)
-# Remove predictors with high correlation values
-#lm3a <- update(lm2a, ~. - log(eFG. + 20) - log(OWS + 20) - sqrt(FG + 20) - sqrt(X2P + 20) - sqrt(X2PA + 20) - log(FT + 20) - 
-#                sqrt(TRB + 20) - sqrt(X3PA + 20) - sqrt(FGA)); summary(lm3a); performance::check_model(lm3a)
-# Remove predictors with high correlation values
 plot(final_data$G, final_data$MP,data=final_data)
 ################################ BACKWARDS STEPWISE SELECTION & ELIMINATION (VARIABLE SELECTION) ######################################
 lm19 <- step(lm3, k = log(n));summary(lm19); performance::check_model(lm19)
