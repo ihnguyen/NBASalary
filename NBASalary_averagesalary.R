@@ -86,9 +86,9 @@ lm2 <- lm((season17_18)^0.33~Age+G+GS+MP+PER+TS.+sqrt(X3PAr)+log(FTr+4)+log(ORB.
 ptf<- powerTransform(season17_18~.,data = final_data)
 summary(ptf)
 # Visual Diagnositics
-par(mfrow=c(1,2));qqPlot(final_data$season17_18);qqPlot((final_data$season17_18)^0.33)
-par(mfrow=c(1,2));hist(final_data$season17_18);hist((final_data$season17_18)^0.33)
-par(mfrow=c(1,2));plot(final_data$season17_18,resid(lm2),data=final_data);plot((final_data$season17_18)^0.33,resid(lm2),data=final_data)
+par(mfrow=c(1,2));qqPlot(final_data$season17_18, xlab="Salary",ylab="Residuals");qqPlot((final_data$season17_18)^0.33, xlab="Salary^0.33",ylab="Residuals")
+par(mfrow=c(1,2));hist(final_data$season17_18, main="", xlab="Salary");hist((final_data$season17_18)^0.33,main="", xlab="Salary^0.33")
+par(mfrow=c(1,2));plot(final_data$season17_18,resid(lm2),data=final_data, xlab="Salary",ylab="Residuals");plot((final_data$season17_18)^0.33,resid(lm2),data=final_data, xlab="Salary^0.33",ylab="Residuals")
 # Is there a relationship between the response and at least one predictor in our regression model?
 null <- lm((season17_18)^0.33~1, data=final_data)
 anova(null,lm2)
