@@ -79,12 +79,14 @@ round(cor(final_data[,c(1:46)]),4)
 lm1 <- lm(season17_18 ~ ., data = final_data); summary(lm1);performance::check_model(lm1)
 # Fit regression with transformed predictors and response (Full model)
 lm2 <- lm((season17_18)^0.33~Age+G+GS+MP+PER+TS.+sqrt(X3PAr)+log(FTr+4)+log(ORB.+1)+DRB.+log(TRB.+1)+log(AST.+1)+STL.+sqrt(BLK.)
-          + log(TOV.+ 20) + USG. + log(OWS+ 20) + sqrt(DWS+ 20) + sqrt(WS+ 20) + WS.48 + sqrt(OBPM + 20) + sqrt(DBPM + 20) + BPM + log(VORP+ 20) + sqrt(FG+ 20) + FG.+ sqrt(FGA) + sqrt(X3PA+ 20) + sqrt(X2P+ 20) + 
+          + log(TOV.+ 20) + log(USG. +1) + log(OWS+ 20) + sqrt(DWS+ 20) + sqrt(WS+ 20) + WS.48 + sqrt(OBPM + 20) + sqrt(DBPM + 20) + BPM + log(VORP+ 20) + sqrt(FG+ 20) + FG.+ sqrt(FGA) + sqrt(X3PA+ 20) + sqrt(X2P+ 20) + 
             sqrt(X2PA+ 20) + log(X2P.+ 20) + log(eFG.+ 20) + log(FT+ 20) + log(FTA +6) + FT. + log(ORB+ 20) + sqrt(DRB+ 20) + sqrt(TRB+ 20) + log(AST+ 20) + sqrt(STL+ 20) + log(BLK+ 20) + sqrt(TOV+ 20) + PF + sqrt(PTS+ 20)
           , data=final_data); summary(lm2); performance::check_model(lm2)
 # Check if response needs to be transformed using Box-Cox transformation
 ptf<- powerTransform(season17_18~.,data = final_data)
 summary(ptf)
+
+
 par(mfrow=c(2,3));qqPlot(final_data$season17_18);qqPlot((final_data$season17_18)^0.33);hist(final_data$season17_18);hist((final_data$season17_18)^0.33);plot(final_data$season17_18,resid(lm2),data=final_data);plot((final_data$season17_18)^0.33,resid(lm2),data=final_data)
 # Is there a relationship between the response and at least one predictor in our regression model?
 null <- lm((season17_18)^0.33~1, data=final_data)
