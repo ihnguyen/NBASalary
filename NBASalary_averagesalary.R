@@ -74,6 +74,24 @@ range(final_data$TOV)
 range(final_data$PF)
 range(final_data$PTS)
 round(cor(final_data[,c(1:46)]),4)
+##################################### OVERALL F-TEST AND MODELING ##################################################################
+# Fit the regression, summarize and check assumptions
+lm1 <- lm(season17_18 ~ ., data = final_data); summary(lm1);performance::check_model(lm1)
+# Check if response needs to be transformed using Box-Cox transformation
+ptf<- powerTransform(season17_18~.,data = final_data)
+summary(ptf)
+# Fit regression with transformed predictors and response (Full model)
+lm2 <- lm((season17_18)^0.33~Age+G+GS+MP+PER+TS.+sqrt(X3PAr)+log(FTr+4)+log(ORB.+1)+DRB.+log(TRB.+1)+log(AST.+1)+STL.+sqrt(BLK.)
+          + log(TOV.+ 20) + log(USG.) + log(OWS+ 20) + sqrt(DWS+ 20) + sqrt(WS+ 20) + WS.48 + sqrt(OBPM + 20) + sqrt(DBPM + 20) + BPM + log(VORP+ 20) + sqrt(FG+ 20) + FG.+ sqrt(FGA) + sqrt(X3PA+ 20) + sqrt(X2P+ 20) + 
+            sqrt(X2PA+ 20) + log(X2P.+ 20) + log(eFG.+ 20) + log(FT+ 20) + log(FTA +6) + FT. + log(ORB+ 20) + sqrt(DRB+ 20) + sqrt(TRB+ 20) + log(AST+ 20) + sqrt(STL+ 20) + log(BLK+ 20) + sqrt(TOV+ 20) + PF + sqrt(PTS+ 20)
+          , data=final_data); summary(lm2); performance::check_model(lm2)
+# Visual Diagnostics of untransformed and transformed response
+par(mfrow=c(1,2));qqPlot(final_data$season17_18, xlab="Salary",ylab="Residuals");qqPlot((final_data$season17_18)^0.33, xlab="Salary^0.33",ylab="Residuals")
+par(mfrow=c(1,2));hist(final_data$season17_18, main="", xlab="Salary");hist((final_data$season17_18)^0.33,main="", xlab="Salary^0.33")
+par(mfrow=c(1,2));plot(final_data$season17_18,resid(lm2),data=final_data, xlab="Salary",ylab="Residuals");plot((final_data$season17_18)^0.33,resid(lm2),data=final_data, xlab="Salary^0.33",ylab="Residuals")
+# Is there a relationship between the response and at least one predictor in our regression model?
+null <- lm((season17_18)^0.33~1, data=final_data)
+anova(null,lm2)
 ##################################### TRANSFORMATIONS of PREDICTORS ##################################################################
 ## Nhi's Plots for transformation##
 # No transformation needed
@@ -102,151 +120,119 @@ par(mfrow=c(2,2));hist(final_data$TRB., main="Total Rebound Percentage");qqPlot(
 par(mfrow=c(2,2));hist(final_data$AST., main="Assist Percentage");qqPlot(final_data$AST.);plot((final_data$AST.),resid(lm1),data=final_data);plot(log(final_data$AST.),resid(lm1),data=final_data)
 # No transformation needed
 par(mfrow=c(2,2));hist(final_data$STL., main="Steal Percentage");qqPlot(final_data$STL.);plot(final_data$STL.,resid(lm1),data=final_data)
-# log transformation; either sqrt and log work here
+# sqrt transformation
 par(mfrow=c(2,2));hist(final_data$BLK., main="Block Percentage");qqPlot(final_data$BLK.);plot((final_data$BLK.),resid(lm1),data=final_data);plot(log(final_data$BLK.),resid(lm1),data=final_data)
-## Angel's Plots for transformation##
-#Right Skew
-par(mfrow=c(2,2)); ggplot(final_data, aes(X2PA)) + geom_histogram()
-#log() made it left skewed.. sqrt() makes data most normal
-par(mfrow=c(2,2)); hist(sqrt(final_data$X2PA)); qqPlot(sqrt(final_data$X2PA)); plot(final_data$X2PA, lm1$residuals)
-#Normal-Looking
-ggplot(final_data, aes(sqrt(X2P.))) + geom_histogram()
-qqPlot((sqrt(final_data$X2P.))); plot(final_data$X2P., lm1$residuals)
-#Normal-Looking
-ggplot(final_data, aes(eFG.)) + geom_histogram()
-qqPlot(final_data$eFG.); plot(final_data$eFG., lm1$residuals)
-#Right Skew
-ggplot(final_data, aes(FT)) + geom_histogram()
-par(mfrow=c(2,2));qqPlot(sqrt(final_data$FT)); qqPlot(final_data$FT + 1); plot(final_data$FT, lm1$residuals); plot(log(final_data$FT), lm1$residuals)
-#Right Skew
-ggplot(final_data, aes(FTA)) + geom_histogram()
-# I think log() is better here?
-qqPlot(log(final_data$FTA)); qqPlot(sqrt(final_data$FTA)); plot(final_data$FTA, lm1$residuals);plot(log(final_data$FTA), lm1$residuals)
-#Left Skew
-ggplot(final_data, aes(FT.)) + geom_histogram()
-#Log and sqrt don't seem to change it much. After residuals, lets keep original
-qqPlot(sqrt(final_data$FT.)); qqPlot(log(final_data$FT. + 20)); plot(final_data$FT., lm1$residuals); plot(log(final_data$FT.), lm1$residuals)
-#Right Skew
-ggplot(final_data, aes(ORB)) + geom_histogram()
-#Both help, but not sure which is better. Let's use the log transform
-par(mfrow=c(2,2));qqPlot(sqrt(final_data$ORB)); qqPlot(log(final_data$ORB + 1)); plot(final_data$ORB, lm1$residuals);  plot(log(final_data$ORB), lm1$residuals)
-#Right Skew
-ggplot(final_data, aes(DRB)) + geom_histogram()
-# sqrt transformation
-par(mfrow=c(2,2));  qqPlot(sqrt(final_data$DRB)); qqPlot(log(final_data$DRB + 1)); plot(final_data$DRB, lm1$residuals); plot(sqrt(final_data$DRB), lm1$residuals)
-#Right Skew
-ggplot(final_data, aes(TRB)) + geom_histogram()
-# sqrt transformation
-par(mfrow=c(2,2)); qqPlot(sqrt(final_data$TRB)); qqPlot(log(final_data$TRB + 1)); plot(final_data$TRB, lm1$residuals);  plot(sqrt(final_data$TRB), lm1$residuals)
-#Right Skew
-ggplot(final_data, aes(AST)) + geom_histogram()
-# sqrt transformation
-par(mfrow=c(2,2)); qqPlot(sqrt(final_data$AST)); qqPlot(log(final_data$AST + 1)); plot(final_data$AST, lm1$residuals); plot(log(final_data$AST), lm1$residuals)
-#Right Skew
-ggplot(final_data, aes(STL)) + geom_histogram()
-#sqrt normalizes; use sqrt
-par(mfrow=c(2,3)); qqPlot(final_data$STL); qqPlot(sqrt(final_data$STL)); qqPlot(log(final_data$STL + 1)); plot(final_data$STL, lm1$residuals);  plot(sqrt(final_data$STL), lm1$residuals)
-#Right Skew
-ggplot(final_data, aes(BLK)) + geom_histogram()
-# log transformation
-par(mfrow=c(2,3)); qqPlot(final_data$BLK); qqPlot(sqrt(final_data$BLK)); qqPlot(log(final_data$BLK + 1)); plot(final_data$BLK, lm1$residuals);  plot(log(final_data$BLK), lm1$residuals)
-#Right Skew
-ggplot(final_data, aes(TOV)) + geom_histogram()
-# sqrt transformation
-par(mfrow=c(2,3)); qqPlot(final_data$TOV); qqPlot(sqrt(final_data$TOV)); qqPlot(log(final_data$TOV + 1));plot(final_data$TOV, lm1$residuals); plot(log(final_data$TOV), lm1$residuals); plot(sqrt(final_data$TOV), lm1$residuals)
-#Sort of Bimodal
-ggplot(final_data, aes(PF)) + geom_histogram()
-# No transformation
-par(mfrow=c(2,2)); qqPlot(final_data$PF); qqPlot(sqrt(final_data$PF)); qqPlot(log(final_data$PF + 1)); plot(final_data$PF, lm1$residuals)
-#Right Skew
-ggplot(final_data, aes(PTS)) + geom_histogram()
-# sqrt transformation
-par(mfrow=c(2,3)); qqPlot(final_data$PTS); qqPlot(sqrt(final_data$PTS)); qqPlot(log(final_data$PTS + 1)); plot(final_data$PTS, lm1$residuals); plot(log(final_data$PTS), lm1$residuals); plot(sqrt(final_data$PTS), lm1$residuals)
-## Thi's transformation ##
-#RIGHT SKEWED: 
+## Thi's Plots for transformation ##
+# right skewed: log transformation
 ggplot(final_data, aes(TOV.)) + geom_histogram()
-par(mfrow=c(2,3));hist(final_data$TOV., main="Games");qqPlot(final_data$TOV);plot(final_data$TOV,resid(lm1),data=final_data)
+par(mfrow=c(2,3));hist(final_data$TOV.);qqPlot(final_data$TOV);plot(final_data$TOV,resid(lm1),data=final_data)
 qqPlot(log(final_data$TOV. + 1))
-#Use log
 plot(log(final_data$TOV.),resid(lm1),data=final_data)
-#LIGHT RIGHT SKEWED : No transformation needed
+# right skewed: log transformation
 ggplot(final_data, aes(USG.)) + geom_histogram()
-# No Transformation
-par(mfrow=c(2,3));hist(final_data$USG., main="Games");qqPlot(final_data$USG.);plot(final_data$USG.,resid(lm1),data=final_data)
+par(mfrow=c(2,3));hist(final_data$USG., main="");qqPlot(final_data$USG.);plot(final_data$USG.,resid(lm1),data=final_data)
 qqPlot(log(final_data$USG. + 1))
-#right skewed: Use log
+# right skewed: log transformation
 ggplot(final_data, aes(OWS)) + geom_histogram()
-##Normalized:
-par(mfrow=c(2,3));hist(final_data$OWS, main="Games");qqPlot(final_data$OWS);plot(final_data$OWS,resid(lm1),data=final_data) 
+par(mfrow=c(2,3));hist(final_data$OWS, main="");qqPlot(final_data$OWS);plot(final_data$OWS,resid(lm1),data=final_data) 
 qqPlot(sqrt(final_data$OWS)); qqPlot(log(final_data$OWS + 1))
 plot(log(final_data$OWS),resid(lm1),data=final_data)
-#right skewed : sqrt
+# right skewed: sqrt transformation
 ggplot(final_data, aes(DWS)) + geom_histogram()
-##Normalized:
-par(mfrow=c(2,3));hist(final_data$DWS, main="Games");qqPlot(final_data$DWS);plot(final_data$DWS,resid(lm1),data=final_data)
+par(mfrow=c(2,3));hist(final_data$DWS, main="");qqPlot(final_data$DWS);plot(final_data$DWS,resid(lm1),data=final_data)
 plot(sqrt(final_data$DWS),resid(lm1),data=final_data)
-#right skewed : use sqrt
-par(mfrow=c(2,3));hist(final_data$WS, main="Games");qqPlot(final_data$WS);plot(final_data$WS,resid(lm1),data=final_data)
+# right skewed: sqrt transformation
+par(mfrow=c(2,3));hist(final_data$WS, main="");qqPlot(final_data$WS);plot(final_data$WS,resid(lm1),data=final_data)
 plot(sqrt(final_data$WS),resid(lm1),data=final_data)
-#normal : No Transformation
+# normal : No Transformation
 par(mfrow=c(2,3));hist(final_data$WS.48, main="Win shares per 48 min");qqPlot(final_data$WS.48);plot(final_data$WS.48,resid(lm1),data=final_data)
 plot(log(final_data$WS.48),resid(lm1),data=final_data)
 plot(sqrt(final_data$WS.48),resid(lm1),data=final_data)
-#normal : use sqrt
+# sqrt transformation
 ggplot(final_data, aes(OBPM)) + geom_histogram()
 par(mfrow=c(2,3));hist(final_data$OBPM, main="OBPM");qqPlot(final_data$OBPM);plot(final_data$OBPM,resid(lm1),data=final_data)
 plot(sqrt(final_data$OBPM),resid(lm1),data=final_data)
-#normal : use sqrt
+# sqrt transformation
 ggplot(final_data, aes(DBPM)) + geom_histogram()
-par(mfrow=c(2,3));hist(final_data$DMPM, main="DBPM");qqPlot(final_data$DBPM);plot(final_data$DBPM,resid(lm1),data=final_data)
+par(mfrow=c(2,3));hist(final_data$DBPM, main="DBPM");qqPlot(final_data$DBPM);plot(final_data$DBPM,resid(lm1),data=final_data)
 plot(sqrt(final_data$DBPM),resid(lm1),data=final_data)
-#normal : NTN : outliers
+# normal : NTN : outliers
 ggplot(final_data, aes(BPM)) + geom_histogram()
 par(mfrow=c(2,2));hist(final_data$BPM, main="BPM");qqPlot(final_data$BPM);plot(final_data$BPM,resid(lm1),data=final_data)
-#right skewed : use log
+# right skewed: log transformation
 ggplot(final_data, aes(VORP)) + geom_histogram()
-##normalized:
 par(mfrow=c(2,3));hist(final_data$VORP, main="VORP");qqPlot(final_data$VORP);plot(final_data$VORP,resid(lm1),data=final_data)
 plot(log(final_data$VORP),resid(lm1),data=final_data)
-# chucky right skewed?  USE sqrt
+# right skewed: sqrt transformation
 ggplot(final_data, aes(FG)) + geom_histogram()
-##Normalized:
 par(mfrow=c(2,3));hist(final_data$FG, main="FG");qqPlot(final_data$FG);plot(final_data$FG,resid(lm1),data=final_data)
 plot(sqrt(final_data$FG),resid(lm1),data=final_data)
-# right skewed but weird right : USE sqrt
-par(mfrow=c(2,3));hist(final_data$FGA, main="FG");qqPlot(final_data$FGA);plot(final_data$FGA,resid(lm1),data=final_data)
+# right skewed: sqrt transformation
+par(mfrow=c(2,3));hist(final_data$FGA, main="FGA");qqPlot(final_data$FGA);plot(final_data$FGA,resid(lm1),data=final_data)
 plot(sqrt(final_data$FGA),resid(lm1),data=final_data)
-#normal : NTN
+# normal : NTN
 par(mfrow=c(2,3));hist(final_data$FG., main="FG.");qqPlot(final_data$FG.);plot(final_data$FG.,resid(lm1),data=final_data)
 plot(log(final_data$FG.),resid(lm1),data=final_data)
 plot(sqrt(final_data$FG.),resid(lm1),data=final_data)
-# right skewed
-##normalized : USE sqrt
+# right skewed: sqrt transformation
 par(mfrow=c(2,3));qqPlot(sqrt(final_data$X3PA)); qqPlot(log(final_data$X3PA));
 plot(sqrt(final_data$X3PA),resid(lm1),data=final_data)
-#right skewed USE qrt
+# right skewed: sqrt transformation
 ggplot(final_data, aes(X2P)) + geom_histogram()
 par(mfrow=c(2,3));hist(final_data$X2P, main="X2P");qqPlot(final_data$X2P);plot(final_data$X2P,resid(lm1),data=final_data)
 plot(log(final_data$X2P),resid(lm1),data=final_data)
 plot(sqrt(final_data$X2P),resid(lm1),data=final_data)
-##################################### OVERALL F-TEST AND MODELING ##################################################################
-# Fit the regression, summarize and check assumptions
-lm1 <- lm(season17_18 ~ ., data = final_data); summary(lm1);performance::check_model(lm1)
-# Check if response needs to be transformed using Box-Cox transformation
-ptf<- powerTransform(season17_18~.,data = final_data)
-summary(ptf)
-# Fit regression with transformed predictors and response (Full model)
-lm2 <- lm((season17_18)^0.33~Age+G+GS+MP+PER+TS.+sqrt(X3PAr)+log(FTr+4)+log(ORB.+1)+DRB.+log(TRB.+1)+log(AST.+1)+STL.+sqrt(BLK.)
-          + log(TOV.+ 20) + log(USG.) + log(OWS+ 20) + sqrt(DWS+ 20) + sqrt(WS+ 20) + WS.48 + sqrt(OBPM + 20) + sqrt(DBPM + 20) + BPM + log(VORP+ 20) + sqrt(FG+ 20) + FG.+ sqrt(FGA) + sqrt(X3PA+ 20) + sqrt(X2P+ 20) + 
-            sqrt(X2PA+ 20) + log(X2P.+ 20) + log(eFG.+ 20) + log(FT+ 20) + log(FTA +6) + FT. + log(ORB+ 20) + sqrt(DRB+ 20) + sqrt(TRB+ 20) + log(AST+ 20) + sqrt(STL+ 20) + log(BLK+ 20) + sqrt(TOV+ 20) + PF + sqrt(PTS+ 20)
-          , data=final_data); summary(lm2); performance::check_model(lm2)
-# Visual Diagnostics of untransformed and transformed response
-par(mfrow=c(1,2));qqPlot(final_data$season17_18, xlab="Salary",ylab="Residuals");qqPlot((final_data$season17_18)^0.33, xlab="Salary^0.33",ylab="Residuals")
-par(mfrow=c(1,2));hist(final_data$season17_18, main="", xlab="Salary");hist((final_data$season17_18)^0.33,main="", xlab="Salary^0.33")
-par(mfrow=c(1,2));plot(final_data$season17_18,resid(lm2),data=final_data, xlab="Salary",ylab="Residuals");plot((final_data$season17_18)^0.33,resid(lm2),data=final_data, xlab="Salary^0.33",ylab="Residuals")
-# Is there a relationship between the response and at least one predictor in our regression model?
-null <- lm((season17_18)^0.33~1, data=final_data)
-anova(null,lm2)
+## Angel's Plots for transformation##
+# sqrt transformation
+par(mfrow=c(2,2)); hist(sqrt(final_data$X2PA)); qqPlot(sqrt(final_data$X2PA)); plot(final_data$X2PA, lm1$residuals)
+# log transformation
+ggplot(final_data, aes(log(X2P.))) + geom_histogram()
+qqPlot(final_data$X2P.); plot(final_data$X2P., lm1$residuals)
+qqPlot((log(final_data$X2P.))); plot(log(final_data$X2P.), lm1$residuals)
+# log transformation
+ggplot(final_data, aes(eFG.)) + geom_histogram()
+par(mfrow=c(1,2));qqPlot(final_data$eFG.);qqPlot(log(final_data$eFG.))
+par(mfrow=c(1,2));plot(final_data$eFG., lm1$residuals);plot(log(final_data$eFG.), lm1$residuals)
+# Right Skew: log transformation
+ggplot(final_data, aes(FT)) + geom_histogram()
+par(mfrow=c(1,2));qqPlot(log(final_data$FT+20));qqPlot(final_data$FT)
+par(mfrow=c(1,2));plot(final_data$FT, lm1$residuals); plot(log(final_data$FT), lm1$residuals)
+# Right Skew: log transformation
+ggplot(final_data, aes(FTA)) + geom_histogram()
+par(mfrow=c(1,2));qqPlot(log(final_data$FTA+6)); qqPlot(final_data$FTA);
+par(mfrow=c(1,2));plot(final_data$FTA, lm1$residuals);plot(log(final_data$FTA), lm1$residuals)
+# Left Skew: No transformation
+ggplot(final_data, aes(FT.)) + geom_histogram()
+# No transformation
+par(mfrow=c(1,3));qqPlot(sqrt(final_data$FT.)); qqPlot(log(final_data$FT. + 20)); qqPlot(final_data$FT.)
+par(mfrow=c(1,2));plot(final_data$FT., lm1$residuals); plot(log(final_data$FT.), lm1$residuals)
+# Right Skew: log transformation
+ggplot(final_data, aes(ORB)) + geom_histogram()
+par(mfrow=c(2,2));qqPlot(sqrt(final_data$ORB)); qqPlot(log(final_data$ORB + 20)); plot(final_data$ORB, lm1$residuals);  plot(log(final_data$ORB), lm1$residuals)
+# Right Skew: sqrt transformation
+ggplot(final_data, aes(DRB)) + geom_histogram()
+par(mfrow=c(2,2));  qqPlot(sqrt(final_data$DRB)); qqPlot(log(final_data$DRB + 20)); plot(final_data$DRB, lm1$residuals); plot(sqrt(final_data$DRB), lm1$residuals)
+# Right Skew: sqrt transformation
+ggplot(final_data, aes(TRB)) + geom_histogram()
+par(mfrow=c(2,2)); qqPlot(sqrt(final_data$TRB)); qqPlot(log(final_data$TRB + 20)); plot(final_data$TRB, lm1$residuals);  plot(sqrt(final_data$TRB), lm1$residuals)
+# Right Skew: log transformation
+ggplot(final_data, aes(AST)) + geom_histogram()
+par(mfrow=c(2,2)); qqPlot(sqrt(final_data$AST)); qqPlot(log(final_data$AST + 20)); plot(final_data$AST, lm1$residuals); plot(log(final_data$AST), lm1$residuals)
+# Right Skew: sqrt transformation
+ggplot(final_data, aes(STL)) + geom_histogram()
+par(mfrow=c(2,3)); qqPlot(final_data$STL); qqPlot(sqrt(final_data$STL)); qqPlot(log(final_data$STL + 20)); plot(final_data$STL, lm1$residuals);  plot(sqrt(final_data$STL), lm1$residuals)
+# Right Skew: log transformation
+ggplot(final_data, aes(BLK)) + geom_histogram()
+par(mfrow=c(2,3)); qqPlot(final_data$BLK); qqPlot(sqrt(final_data$BLK)); qqPlot(log(final_data$BLK + 20)); plot(final_data$BLK, lm1$residuals);  plot(log(final_data$BLK), lm1$residuals)
+# Right Skew: sqrt transformation
+ggplot(final_data, aes(TOV)) + geom_histogram()
+par(mfrow=c(2,3)); qqPlot(final_data$TOV); qqPlot(sqrt(final_data$TOV)); qqPlot(log(final_data$TOV + 20));plot(final_data$TOV, lm1$residuals); plot(log(final_data$TOV), lm1$residuals); plot(sqrt(final_data$TOV), lm1$residuals)
+# Bimodal: No transformation
+ggplot(final_data, aes(PF)) + geom_histogram()
+par(mfrow=c(2,2)); qqPlot(final_data$PF); qqPlot(sqrt(final_data$PF)); qqPlot(log(final_data$PF + 1)); plot(final_data$PF, lm1$residuals)
+# Right Skew: sqrt transformation
+ggplot(final_data, aes(PTS)) + geom_histogram()
+par(mfrow=c(2,3)); qqPlot(final_data$PTS); qqPlot(sqrt(final_data$PTS)); qqPlot(log(final_data$PTS + 20)); plot(final_data$PTS, lm1$residuals); plot(log(final_data$PTS), lm1$residuals); plot(sqrt(final_data$PTS), lm1$residuals)
 ############################### BACKWARDS ELIMINATION & STEPWISE SELECTION (VARIABLE SELECTION) ############################################################
 n = nrow(final_data)
 # Drop rejects (rho>0.9) with high collinearity & lower correlation with the response variable
