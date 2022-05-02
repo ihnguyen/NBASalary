@@ -243,7 +243,7 @@ lm4 <- update(lm3,~. -log(ORB+20)-log(FT+20)-sqrt(X2PA+20)-sqrt(TOV+20)-sqrt(X2P
 # Run AIC model after dropping rejects with rho>0.83 and perform backwards elimination
 lm4a <- step(lm4);summary(lm4a); performance::check_model(lm4a);anova(lm4a,lm2)
   lm4b <- update(lm4a,~.-PF);summary(lm4b); performance::check_model(lm4b);anova(lm4b,lm2)
-  lm4c <- update(lm4b,~.-sqrt(BLK.));summary(lm4c); performance::check_model(lm4c);anova(lm4c,lm2) #################### good model
+  lm4c <- update(lm4b,~.-sqrt(BLK.));summary(lm4c); performance::check_model(lm4c);anova(lm4c,lm2)
   lm4d <- update(lm4c,~.-GS);summary(lm4d); performance::check_model(lm4d);anova(lm4d,lm2)
   lm4e <- update(lm4d,~.-sqrt(DBPM + 20));summary(lm4e); performance::check_model(lm4e);anova(lm4e,lm2)
   lm4f <- update(lm4e,~.-DRB.);summary(lm4f); performance::check_model(lm4f);anova(lm4f,lm2)
