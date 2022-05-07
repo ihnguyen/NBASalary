@@ -273,7 +273,7 @@ anova(lm21,lm2) # keep lm21
 anova(lm21a,lm2)# keep lm21a
 anova(lm21b,lm2) # keep lm21b
 anova(lm21c,lm2) # use lm2
-# Assign models to a name
+# Assign adjusted r squared values to a variable
 s2 <- summary(lm2)$adj.r.squared
 s3 <- summary(lm3)$adj.r.squared
 s4 <- summary(lm4)$adj.r.squared
@@ -290,10 +290,10 @@ s21 <- summary(lm21)$adj.r.squared
 s21a <- summary(lm21a)$adj.r.squared
 s21b <- summary(lm21b)$adj.r.squared
 s21c <- summary(lm21c)$adj.r.squared
-# View adjusted R squared
+# View adjusted R squared values
 s2;s4;s4a;s4b;s4c;s4d;s4e;s4f;s4g;s4h;s4i
 s2;s3;s21;s21a;s21b;s21c
-# Run BIC/AIC model selection to determine model with lower AIC or BIC
+# Run BIC/AIC model selection to determine models with lower AIC or BIC than the full model
 BIC(lm2,lm3,lm21,lm21a,lm21b,lm21c)
 AIC(lm2,lm4,lm4a,lm4b,lm4c,lm4d,lm4e,lm4f,lm4g,lm4h)
 BIC(lm2,lm4i)
@@ -332,13 +332,12 @@ pred_dame1^3
 # Actual 2017-18 Salary = 26,153,057.0
 
 # Test predictability on 2020-21 salary
-# https://www.basketball-reference.com/leagues/NBA_2021_advanced.html
+# To find the values for 2020-21 Age, Games, Defensive Win Shares and Points, refer to the following website: https://www.basketball-reference.com/leagues/NBA_2021_advanced.html
 pred_dame2 <- predict(lm4i,newdata = data.frame(Age=30,G=67,DWS=0.8,PTS=1928), interval="prediction")
 pred_dame2^3
 # fit        lwr       upr
 # 13,935,753 4,048,273 33,359,456
 # Actual 2021-22 Salary = 31,626,953
-# Note: 2020-21 salary was calculated rather than 2021-22 salary due to Lillard's injury which doesn't give an accurate estimated salary
 ############################################################## FIGURES  ###########################################################################
 # Observe data with statistically significant predictors (lm4i) using Box Plot for paper and presentation
 dd <- final_data %>% 
@@ -373,16 +372,3 @@ knit <- coef(summary(lm4i))
 knit %>% 
   kbl() %>% 
   kable_classic(full_width=F,html_font="Arial")
-# Descriptive Statistics with gt package (Optional use due to similarity to box plots)
-list <- final_data[1:12] %>% 
-  tbl_summary(
-    statistic = ~"{mean}; {median} ({min},{max})"); list
-list1 <- final_data[13:24] %>% 
-  tbl_summary(
-    statistic = ~"{mean}; {median} ({min},{max})"); list1
-list2 <- final_data[25:36] %>% 
-  tbl_summary(
-    statistic = ~"{mean}; {median} ({min},{max})"); list2
-list3 <- final_data[37:46] %>% 
-  tbl_summary(
-    statistic = ~"{mean}; {median} ({min},{max})"); list3
