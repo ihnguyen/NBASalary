@@ -66,14 +66,13 @@ Table 2: Cross-validation results of full model (left) and final model (right)
 **Sources**
 
 1: https://cbabreakdown.com/salary-cap-overview
-2:https://www.kaggle.com/code/koki25ando/nba-salary-prediction-using-multiple-regression/data
+
+2: https://www.kaggle.com/code/koki25ando/nba-salary-prediction-using-multiple-regression/data
+
 3: https://www.basketball-reference.com/leagues/NBA_2021_advanced.html
-Code Appendix
-https://github.com/ihnguyen/NBASalary/blob/main/NBASalary_averagesalary.R
 
 Additional Sources:
-NBA Variable Description:
-[NBA Variables .pdf](https://github.com/ihnguyen/NBASalary/files/8448178/NBA.Variables.pdf)
 
-Link to find recent NBA player's statistics:
-https://www.nba.com/stats/players/traditional/?sort=PLAYER_NAME&dir=1&Season=2021-22&SeasonType=Regular%20Season&PerMode=Totals
+[NBA variables description](https://github.com/ihnguyen/NBASalary/files/8448178/NBA.Variables.pdf)
+
+[Find recent NBA player's statistics here](https://www.nba.com/stats/players/traditional/?sort=PLAYER_NAME&dir=1&Season=2021-22&SeasonType=Regular%20Season&PerMode=Totals)
