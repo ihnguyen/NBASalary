@@ -17,37 +17,46 @@
 ![Pred_1](https://user-images.githubusercontent.com/73903035/193510000-89c6edba-d5e4-4031-8c67-bf1e3cfe0d93.png)
 ![pred_3](https://user-images.githubusercontent.com/73903035/193510008-71b9bc60-2fac-473d-88a4-11c4b422329b.png)
 ![Resp_1](https://user-images.githubusercontent.com/73903035/193510017-8ce1f04a-5a62-4f07-b94a-32005c14505f.png)
+
 Figure 1: Box plots of the distributions of response variable (left) in millions and four significant predictors (middle and right)
 
   Performing Box-Cox transformation resulted in transforming the response variable to the .33 power while visual inference and trial and error led to predictor transformations that include square root and log among others. As for the final model, the only predictor transformation used was square root as seen in Figure 2. Once transformed, the predictors were not exactly linear with respect to the response variable, but they showed a somewhat positive correlation. Age and games were the exceptions as it appeared that age was positive up to a peak, where the correlation then became negative. Additionally, game was negatively correlated with the response variable.
 
 ![trxformed_scatterplot_matrix](https://user-images.githubusercontent.com/73903035/193510070-fa24aa49-bffc-4c95-8ccb-9b1f93048f12.png)
+
 Figure 2: Scatterplot matrix of transformed response variable and four significant predictors
 
 **Methods**
 
-An overall F-test was conducted on the full model against the null model to determine if there was a relationship between the response and at least one predictor. To address multicollinearity issue amongst predictors in the full model and produce a better model, a correlation matrix was used to calculate highly correlated predictors (⍴≥0.83,⍴≤-0.83). Multiple models were developed through a variety of variable selection methods such as backwards elimination and backwards stepwise selection. Each model was evaluated by their overall F-test and partial F-test to determine if any or a subset of predictors were useful at predicting salary. The model with a lower Bayesian Information Criterion (BIC) value than the full model was determined the better model.
-Visual diagnostics were used to check multicollinearity and assumptions regarding normality, linearity, and constant variance. To further assess the model, the final model was evaluated on how well it performed at making future salary predictions. Thus the final data set was split into 70% training set and 30% test set for cross-validation purposes. The mean squared difference between the observed and predicted values were calculated for the full and final model to quantify prediction error.
+  An overall F-test was conducted on the full model against the null model to determine if there was a relationship between the response and at least one predictor. To address multicollinearity issue amongst predictors in the full model and produce a better model, a correlation matrix was used to calculate highly correlated predictors (⍴≥0.83,⍴≤-0.83). Multiple models were developed through a variety of variable selection methods such as backwards elimination and backwards stepwise selection. Each model was evaluated by their overall F-test and partial F-test to determine if any or a subset of predictors were useful at predicting salary. The model with a lower Bayesian Information Criterion (BIC) value than the full model was determined the better model.
+
+  Visual diagnostics were used to check multicollinearity and assumptions regarding normality, linearity, and constant variance. To further assess the model, the final model was evaluated on how well it performed at making future salary predictions. Thus the final data set was split into 70% training set and 30% test set for cross-validation purposes. The mean squared difference between the observed and predicted values were calculated for the full and final model to quantify prediction error.
 
 **Results**
 
-After transforming salary, defensive win shares, and points, the final fitted regression model with associated p-values less than the significance level ⍺=0.05 indicated that age, games, defensive win shares, and points were statistically significant at predicting salary in the presence of each other according to table 1. The equation for the final model is as follows:
+  After transforming salary, defensive win shares, and points, the final fitted regression model with associated p-values less than the significance level ⍺=0.05 indicated that age, games, defensive win shares, and points were statistically significant at predicting salary in the presence of each other according to table 1. The equation for the final model is as follows:
 
 (Estimated Salary)0.33 = -776 +2.43(Age) -0.621(Games) +178(Defensive Win Shares+20)0.5 +3.95(Points+20)0.5
 
 ![Summary_table(cropped)](https://user-images.githubusercontent.com/73903035/193510172-405d6bb2-3eff-47d0-912a-e0e31c17ee5e.png)
+
 Table 1: Regression summary table of final model’s statistically significant predictors
-The overall F-test with a F-statistic 14.5 greater than 1 and an associated p-value 2.2x10-16 less than the significance level ⍺=0.05 indicated that at least one predictor was significant at predicting salary. The correlation matrix determined that 16 variables were highly correlated; therefore, were removed from the model to solve the multicollinearity problem. Subsequently, many insignificant variables were removed using backwards stepwise selection. When comparing the final and full model, a p-value 0.0741 greater than the significance level ⍺=0.05 resulted in the acceptance of the final model over the full model. Additionally, the BIC value 4160 of the final model being lower than the BIC value 4340 of the full model provided evidence that the final model was the better model.
-The visual diagnostics in Figure 3 indicated that the residuals versus fitted values and standardized residuals versus fitted values plots reasonably met the constant variance and linearity assumptions. The low variance inflation factor (VIF) values in the collinearity plot confirmed multicollinearity was no longer an issue. To assess the normality assumption, the quantile-quantile (QQ) plot showed that most data points follow the diagonal line thus in agreement that the data followed a normal distribution. 
+
+  The overall F-test with a F-statistic 14.5 greater than 1 and an associated p-value 2.2x10-16 less than the significance level ⍺=0.05 indicated that at least one predictor was significant at predicting salary. The correlation matrix determined that 16 variables were highly correlated; therefore, were removed from the model to solve the multicollinearity problem. Subsequently, many insignificant variables were removed using backwards stepwise selection. When comparing the final and full model, a p-value 0.0741 greater than the significance level ⍺=0.05 resulted in the acceptance of the final model over the full model. Additionally, the BIC value 4160 of the final model being lower than the BIC value 4340 of the full model provided evidence that the final model was the better model.
+  
+  The visual diagnostics in Figure 3 indicated that the residuals versus fitted values and standardized residuals versus fitted values plots reasonably met the constant variance and linearity assumptions. The low variance inflation factor (VIF) values in the collinearity plot confirmed multicollinearity was no longer an issue. To assess the normality assumption, the quantile-quantile (QQ) plot showed that most data points follow the diagonal line thus in agreement that the data followed a normal distribution. 
 
 ![model_check](https://user-images.githubusercontent.com/73903035/193510196-d5d1f6cd-e833-4fbe-a2ff-189ad9159518.png)
+
 Figure 3: Plots of the fitted values versus residuals (top left), fitted values versus standardized residuals (top right), predictors versus VIF (bottom left), and QQ plot (bottom right)
 
 ![cv_table1(cropped)](https://user-images.githubusercontent.com/73903035/193510318-7d41ead0-0073-470c-b065-66465a4fa843.png)
 ![cv_table2(cropped)](https://user-images.githubusercontent.com/73903035/193510326-558c01d4-0660-4edd-985a-e673559b1d97.png)
+
 Table 2: Cross-validation results of full model (left) and final model (right)
 
   The R2 values for full model and final model were 0.505 and 0.638, respectively. In practice, any full model should have a larger R2  value compared to a reduced model. This is one of the problems that occurred during this study while finding a better fit model. This could account for the multicollinearity of numerous predictors that were excluded from the model. However, based on the final R2 value, this indicated that 63.8% of the final model prediction was dependent on the predictors Age, G, DWS, and Points. The full model RMSE of 47.0 and the final model RMSE of 38.2 was illustrated in table 2. Since the final model had a lower RMSE compared to the full model, the final model was proven to be the better model. This also defined that the chosen predictors performed 19% less in root mean squared error compared to the full model.
+  
   Evidently, it appeared that compensation in the NBA was a reward for previous performance as well as for projected or expected future performance in the league. It is possible, however, that previous performance and predicted performance were not reliable indications of appropriate remuneration. For instance, Stephen Curry was observed as one of the extreme outliers in this study who gets paid over 46M in 20213. Nevertheless, the final model predicted his salary based on Stephen’s statistics to be $14M with confidence interval between $4M ~ 33M.  Meanwhile, Damian Lillard’s salary was 30M in 2021. Statistically, the final model was able to confirm his salary which gave an interval between $4M ~ 32M in 2021.  
 
 **Conclusion**
